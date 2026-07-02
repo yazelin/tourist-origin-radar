@@ -225,6 +225,7 @@ function App() {
   const totalYoy = previousTotal ? ((total - previousTotal) / previousTotal) * 100 : null
   const alertRows = marketRowsWithShare.filter((row) => row.share >= threshold || (row.yoy != null && row.yoy >= threshold * 2)).slice(0, 6)
   const activeEndpoints = dataset.source?.endpoints?.filter((endpoint) => endpoint.ok && endpoint.rows > 1).length
+  const noDataEndpoints = dataset.source?.endpoints?.filter((endpoint) => !endpoint.ok || endpoint.rows <= 1) || []
   const totalAll = dataset.source?.totalAll
 
   const annualRowsByName = useMemo(() => new Map(annualDataset.rows.flatMap((row) => [
@@ -376,6 +377,11 @@ function App() {
             </label>
           ))}
           <button type="button" onClick={() => setSelectedAirports(airportOptions)}>全選</button>
+          {noDataEndpoints.length > 0 && (
+            <span className="airport-note" title={noDataEndpoints.map((endpoint) => endpoint.label).join('、')}>
+              其他 {noDataEndpoints.length} 座機場暫無資料（多為國內線，或近 3 小時無國際入境）
+            </span>
+          )}
         </section>
       )}
 

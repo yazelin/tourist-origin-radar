@@ -126,6 +126,12 @@ h2 {
   font-weight: 700;
 }
 
+.airport-note {
+  color: #8a8474;
+  font-size: 12px;
+  cursor: help;
+}
+
 .control-band {
   display: grid;
   grid-template-columns: minmax(104px, 0.55fr) minmax(108px, 0.55fr) minmax(200px, 1.5fr) minmax(130px, 0.8fr) minmax(120px, 0.7fr) minmax(100px, auto) repeat(2, auto);
