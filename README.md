@@ -39,6 +39,19 @@
 
 多年來源趨勢圖固定使用年度資料，範圍為 2002-2025。當目前視角是近即時時，趨勢圖會拿近即時 Top 來源去對照它們的年度歷史；當目前視角是年度時，則對照年度 Top 來源的長期趨勢。
 
+### 多年來源趨勢更新方式
+
+多年來源趨勢不是由近即時 APIS 累積而來，而是直接讀交通部觀光署年度 CSV：
+
+- 前端載入時會呼叫 `/api/residence/annual`。
+- `/api/residence/annual` 會抓 `https://stat.taiwan.net.tw/data/opendata/7` 並解析所有年份欄位。
+- 目前官方 CSV 可解析到 2002-2025，因此趨勢圖顯示 2002-2025。
+- Vercel serverless 回應設定 `Cache-Control: s-maxage=43200, stale-while-revalidate=86400`，也就是 CDN 正常快取 12 小時，過期後可用舊資料並背景更新 24 小時。
+- 如果官方年度 CSV 暫時不可用，前端會使用 repo 內建的 `src/data/fallbackResidence.js`，目前內建主要市場 2002-2025。
+- 官方未來發布新年度欄位時，不需要改圖表邏輯；`/api/residence/annual` 會自動把新的年份欄位納入。只有在需要更新離線備援樣本時，才要同步更新 `fallbackResidence.js`。
+
+換句話說：近即時資料負責「短期來源比例」，多年來源圖負責「長期背景脈絡」。兩者圖表樣式相近，但資料來源與更新節奏不同。
+
 ## 參考與整合
 
 GitHub 上已有開發者使用移民署 APIS 做資料收集，但不是完整行銷產品：
