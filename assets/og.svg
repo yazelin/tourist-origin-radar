@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#f5f2ea"/>
+  <rect width="1200" height="8" fill="#1f7a8c"/>
+
+  <!-- radar rings, right side -->
+  <g transform="translate(920,315)" fill="none" stroke="#1f7a8c">
+    <circle r="230" stroke-opacity="0.12" stroke-width="2"/>
+    <circle r="175" stroke-opacity="0.18" stroke-width="2"/>
+    <circle r="120" stroke-opacity="0.26" stroke-width="2"/>
+    <circle r="65" stroke-opacity="0.36" stroke-width="2"/>
+    <line x1="-230" y1="0" x2="230" y2="0" stroke-opacity="0.14" stroke-width="2"/>
+    <line x1="0" y1="-230" x2="0" y2="230" stroke-opacity="0.14" stroke-width="2"/>
+    <path d="M0 0 L230 0 A230 230 0 0 0 162.6 -162.6 Z" fill="#1f7a8c" fill-opacity="0.16" stroke="none"/>
+    <line x1="0" y1="0" x2="162.6" y2="-162.6" stroke="#1f7a8c" stroke-opacity="0.7" stroke-width="3"/>
+  </g>
+  <!-- blips -->
+  <g fill="#e4572e">
+    <circle cx="1000" cy="230" r="9"/>
+    <circle cx="870" cy="380" r="7" fill="#f3a712"/>
+    <circle cx="1010" cy="400" r="6" fill="#2d936c"/>
+    <circle cx="850" cy="250" r="6" fill="#5b6c8f"/>
+  </g>
+
+  <!-- ranking bars, bottom-left -->
+  <g transform="translate(84,438)">
+    <rect x="0" y="0" width="340" height="26" rx="5" fill="#1f7a8c"/>
+    <rect x="0" y="38" width="255" height="26" rx="5" fill="#e4572e"/>
+    <rect x="0" y="76" width="185" height="26" rx="5" fill="#f3a712"/>
+    <rect x="0" y="114" width="120" height="26" rx="5" fill="#2d936c"/>
+  </g>
+
+  <!-- text -->
+  <g font-family="Noto Sans CJK TC, Noto Sans TC, sans-serif">
+    <text x="84" y="150" font-size="34" font-weight="700" fill="#1f7a8c" letter-spacing="6">TAIWAN INBOUND MARKET RADAR</text>
+    <text x="84" y="248" font-size="76" font-weight="900" fill="#1d2528">台灣入境旅客</text>
+    <text x="84" y="348" font-size="76" font-weight="900" fill="#1d2528">來源市場雷達</text>
+    <text x="84" y="408" font-size="30" fill="#4b5560">移民署近即時 OpenData × 觀光署年度統計 × 行銷提醒</text>
+    <text x="84" y="600" font-size="26" fill="#8a8474">tourist-origin-radar.vercel.app</text>
+  </g>
+</svg>

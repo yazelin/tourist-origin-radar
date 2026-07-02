@@ -233,6 +233,19 @@ npm run build
 npm run preview
 ```
 
+## OG / 社群分享圖
+
+- `public/og.png`：網站分享圖（1200x630），由 `index.html` 的 `og:image` 引用，跟著 Vercel 部署。
+- `assets/og.svg`：上面那張的 SVG 原始檔。
+- `assets/social-preview.png` / `assets/social-preview.svg`：GitHub repo Social preview 用（1280x640）。GitHub 不會自動讀 repo 檔案，要到 repo Settings → Social preview 手動上傳。
+
+改字重出圖（需要 inkscape 與 Noto Sans CJK 字型）：
+
+```bash
+inkscape assets/og.svg --export-type=png --export-filename=public/og.png -w 1200 -h 630
+inkscape assets/social-preview.svg --export-type=png --export-filename=assets/social-preview.png -w 1280 -h 640
+```
+
 ## 資料來源
 
 - 移民署桃園機場入境人次預報：https://data.gov.tw/dataset/88851
