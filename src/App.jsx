@@ -129,6 +129,7 @@ function App() {
   const [threshold, setThreshold] = useState(8)
   const [includeDomestic, setIncludeDomestic] = useState(false)
   const [selectedAirports, setSelectedAirports] = useState([])
+  const [notifyEnabled, setNotifyEnabled] = useState(false)
   const fileInputRef = useRef(null)
 
   useEffect(() => {
@@ -224,6 +225,19 @@ function App() {
     .reduce((sum, row) => sum + row.share, 0)
   const totalYoy = previousTotal ? ((total - previousTotal) / previousTotal) * 100 : null
   const alertRows = marketRowsWithShare.filter((row) => row.share >= threshold || (row.yoy != null && row.yoy >= threshold * 2)).slice(0, 6)
+  const alertSummary = alertRows.map((row) => `${row.marketZh} ${formatPercent(row.share)}`).join('、')
+
+  useEffect(() => {
+    if (!notifyEnabled || !alertSummary) return
+    new Notification('Tourist Origin Radar 市場提醒', { body: alertSummary, icon: '/favicon-192.png' })
+  }, [notifyEnabled, alertSummary])
+
+  async function enableNotify() {
+    if (!('Notification' in window)) return
+    if (Notification.permission === 'granted' || (await Notification.requestPermission()) === 'granted') {
+      setNotifyEnabled(true)
+    }
+  }
   const activeEndpoints = dataset.source?.endpoints?.filter((endpoint) => endpoint.ok && endpoint.rows > 1).length
   const noDataEndpoints = dataset.source?.endpoints?.filter((endpoint) => !endpoint.ok || endpoint.rows <= 1) || []
   const totalAll = dataset.source?.totalAll
@@ -402,9 +416,16 @@ function App() {
           <small>{isRealtime ? '近即時 endpoint 成功回傳' : '跨區域廣告預算檢查點'}</small>
         </article>
         <article>
-          <span>提醒命中</span>
+          <span>
+            提醒命中
+            {'Notification' in window && (
+              <button type="button" className="notify-toggle" onClick={enableNotify} disabled={notifyEnabled}>
+                {notifyEnabled ? '通知已開啟' : '開啟瀏覽器通知'}
+              </button>
+            )}
+          </span>
           <strong>{alertRows.length}</strong>
-          <small>依佔比與年增門檻</small>
+          <small>{alertSummary || '依佔比與年增門檻'}</small>
         </article>
       </section>
 

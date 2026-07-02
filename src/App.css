@@ -132,6 +132,22 @@ h2 {
   cursor: help;
 }
 
+.notify-toggle {
+  margin-left: 8px;
+  padding: 1px 8px;
+  border: 1px solid #c7c0b3;
+  border-radius: 999px;
+  background: #fffdf8;
+  color: #1f7a8c;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.notify-toggle:disabled {
+  color: #2d936c;
+  cursor: default;
+}
+
 .control-band {
   display: grid;
   grid-template-columns: minmax(104px, 0.55fr) minmax(108px, 0.55fr) minmax(200px, 1.5fr) minmax(130px, 0.8fr) minmax(120px, 0.7fr) minmax(100px, auto) repeat(2, auto);
