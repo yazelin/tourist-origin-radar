@@ -91,6 +91,41 @@ h2 {
   background: #f3a712;
 }
 
+.topbar-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.promo-links {
+  display: inline-flex;
+  gap: 14px;
+}
+
+.promo-links a {
+  display: inline-flex;
+  color: #8a8474;
+}
+
+.promo-links a:hover {
+  color: #1f7a8c;
+}
+
+.snapshot-notice {
+  padding: 7px 24px;
+  background: #fdf3dc;
+  border-bottom: 1px solid #ecd9a8;
+  color: #6b5a26;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.snapshot-notice a {
+  color: #14606f;
+  font-weight: 700;
+}
+
 .control-band {
   display: grid;
   grid-template-columns: minmax(104px, 0.55fr) minmax(108px, 0.55fr) minmax(200px, 1.5fr) minmax(130px, 0.8fr) minmax(120px, 0.7fr) minmax(100px, auto) repeat(2, auto);

@@ -2,7 +2,48 @@
 
 即時旅客來源國家比例行銷工具原型，回應 wish-pool 的 `wish-20`。
 
+- 線上 demo：https://tourist-origin-radar.vercel.app
+- 原始碼：https://github.com/yazelin/tourist-origin-radar
+
 這個站的定位是 **demo / starter kit**。公開 demo 可以讓行銷業者看資料視覺化與提醒工作流；正式使用時建議 fork 本 repo 後自行部署，並接上自己的資料源、快取策略和權限控管。
+
+> **線上 demo 的近即時畫面是「快照」，不是真即時。** Vercel（以及 GitHub-hosted Actions）的雲端出口連不上移民署 APIS，所以線上 demo 的近即時模式顯示的是 repo 內建、從本機抓取後 commit 進來的快照資料，頁面上會標示「近即時快照」與擷取時間。要看真正的近即時資料，目前只能在可連線移民署 APIS 的網路（實測台灣本機網路可以）自行部署，見下方「快速開始」。
+
+## 快速開始
+
+### 只想看畫面
+
+直接開線上 demo：https://tourist-origin-radar.vercel.app 。近即時模式顯示內建快照，年度模式（2002-2025 官方統計）則是每次載入即時抓官方 CSV，完全真實。
+
+### 本機跑出「真即時」資料
+
+前置需求：Node.js 20+、位於可連線移民署 APIS 的網路（台灣的家用/公司網路實測可以；海外雲端多半不行）。
+
+```bash
+git clone https://github.com/yazelin/tourist-origin-radar.git
+cd tourist-origin-radar
+npm install
+npx vercel dev   # 第一次會問要不要 link 專案，選 no 也能跑
+```
+
+開 `http://127.0.0.1:3000`，狀態列顯示「近即時」（綠燈）就是當下直連移民署的真即時資料；`/api/arrivals/realtime` 每次會抓 18 個機場 endpoint，只有近 3 小時有入境且上游有發布的機場會出現在機場篩選列（多數時段只有 TPE/KHH，偶爾加 RMQ）。
+
+注意：`npm run dev`（純 Vite）不會啟動 `/api` serverless function，畫面只會用內建樣本；要測完整資料流請用 `npx vercel dev`。
+
+### 更新線上 demo 的快照
+
+在可連線移民署 APIS 的機器上：
+
+```bash
+node scripts/update-realtime-snapshot.mjs   # 重抓上游、覆寫 api/arrivals/realtimeSnapshot.js
+git commit -am "chore: refresh realtime snapshot" && git push
+```
+
+push 後 Vercel 自動重新部署，線上 demo 的快照時間就會更新。
+
+### 部署自己的正式版
+
+fork 後照下方「免費部署建議」上 Vercel 即可跑起來，但近即時一樣會退回快照。要讓公開站有真即時，需要其中一種：台灣主機/VM 直接跑本專案、台灣區資料 proxy 讓 Vercel 讀、或台灣的自架 runner 定時執行上面的快照更新腳本。細節見「部署注意」。
 
 ## 可行性判斷
 
