@@ -40,6 +40,11 @@ function formatPercent(value, digits = 1) {
   return `${Number(value || 0).toFixed(digits)}%`
 }
 
+function formatAxisNumber(value) {
+  if (Math.abs(value) >= 10000) return `${value / 10000}萬`
+  return formatNumber(value)
+}
+
 function splitMarketName(rawName) {
   const normalized = String(rawName || '').replace(/\s+/g, ' ').trim()
   const match = normalized.match(/^(.+?)\s+([A-Za-z][A-Za-z .'-]+)$/)
@@ -109,7 +114,7 @@ function App() {
     let cancelled = false
     async function load() {
       try {
-        const response = await fetch('/api/residence/annual')
+        const response = await fetch('/api/arrivals/realtime')
         if (!response.ok) throw new Error(`API ${response.status}`)
         const contentType = response.headers.get('content-type') || ''
         if (!contentType.includes('application/json')) {
@@ -120,13 +125,13 @@ function App() {
         setDataset(payload)
         setYear(payload.years.at(-1))
         setStatus('live')
-        setStatusText('已透過 Vercel API 讀取官方 CSV')
+        setStatusText(`已讀取移民署近即時 OpenData，外籍來源 ${formatNumber(payload.source?.totalForeign)} 人次`)
       } catch (error) {
         if (cancelled) return
         setDataset(fallbackResidence)
         setYear(fallbackResidence.years.at(-1))
         setStatus('fallback')
-        setStatusText(`使用內建樣本。部署到 Vercel 或執行 vercel dev 後會啟用 API: ${error.message}`)
+        setStatusText(`使用年度備援樣本。部署到 Vercel 或執行 vercel dev 後會啟用近即時 API: ${error.message}`)
       }
     }
     load()
@@ -139,6 +144,7 @@ function App() {
   const previousYear = String(Number(selectedYear) - 1)
   const total = dataset.totals?.[selectedYear] || dataset.rows.reduce((sum, row) => sum + (row.values[selectedYear] || 0), 0)
   const previousTotal = dataset.totals?.[previousYear]
+  const isRealtime = dataset.source?.mode === 'realtime'
 
   const marketRows = useMemo(() => {
     return dataset.rows
@@ -161,6 +167,8 @@ function App() {
     .reduce((sum, row) => sum + row.share, 0)
   const totalYoy = previousTotal ? ((total - previousTotal) / previousTotal) * 100 : null
   const alertRows = marketRows.filter((row) => row.share >= threshold || (row.yoy != null && row.yoy >= threshold * 2)).slice(0, 6)
+  const activeEndpoints = dataset.source?.endpoints?.filter((endpoint) => endpoint.ok && endpoint.rows > 1).length
+  const totalAll = dataset.source?.totalAll
 
   const trendData = dataset.years.map((item) => {
     const point = { year: item }
@@ -171,12 +179,13 @@ function App() {
   })
 
   function handleExportCsv() {
-    const header = ['year', 'region', 'market_zh', 'market_en', 'arrivals', 'share_percent', 'yoy_percent']
+    const header = ['period', 'region', 'market_zh', 'market_en', 'nationality', 'arrivals', 'share_percent', 'yoy_percent']
     const rows = marketRows.map((row) => [
       selectedYear,
       row.region,
       row.marketZh,
       row.marketEn,
+      row.nationality || '',
       row.arrivals,
       row.share.toFixed(3),
       row.yoy == null ? '' : row.yoy.toFixed(3),
@@ -236,7 +245,7 @@ function App() {
 
       <section className="control-band" aria-label="資料與篩選">
         <label>
-          年度
+          資料期間
           <select value={selectedYear} onChange={(event) => setYear(event.target.value)}>
             {dataset.years.map((item) => <option key={item}>{item}</option>)}
           </select>
@@ -262,9 +271,9 @@ function App() {
 
       <section className="metric-grid" aria-label="關鍵指標">
         <article>
-          <span>總入境人次</span>
+          <span>{isRealtime ? '外籍來源人次' : '總入境人次'}</span>
           <strong>{formatNumber(total)}</strong>
-          <small>{totalYoy == null ? '無前期比較' : `年增 ${formatPercent(totalYoy)}`}</small>
+          <small>{isRealtime && totalAll ? `全部入境 ${formatNumber(totalAll)}，已排除 TWN` : totalYoy == null ? '無前期比較' : `年增 ${formatPercent(totalYoy)}`}</small>
         </article>
         <article>
           <span>最大來源</span>
@@ -272,9 +281,9 @@ function App() {
           <small>{topMarket ? `${formatNumber(topMarket.arrivals)} 人次 / ${formatPercent(topMarket.share)}` : '-'}</small>
         </article>
         <article>
-          <span>亞洲來源佔比</span>
-          <strong>{formatPercent(asiaShare)}</strong>
-          <small>跨區域廣告預算檢查點</small>
+          <span>{isRealtime ? '有資料機場' : '亞洲來源佔比'}</span>
+          <strong>{isRealtime ? activeEndpoints ?? '-' : formatPercent(asiaShare)}</strong>
+          <small>{isRealtime ? '近即時 endpoint 成功回傳' : '跨區域廣告預算檢查點'}</small>
         </article>
         <article>
           <span>提醒命中</span>
@@ -288,7 +297,7 @@ function App() {
           <div className="panel-head">
             <div>
               <h2>來源國比例排行</h2>
-              <p>官方公開資料可得的最新年度；月資料需依觀光署發布日更新。</p>
+              <p>{isRealtime ? '移民署入境人次預報，近 3 小時、依國籍加總。' : '官方公開資料可得的最新年度；月資料需依觀光署發布日更新。'}</p>
             </div>
             <div className="button-row">
               <button type="button" onClick={handleExportCsv}><Download size={17} />CSV</button>
@@ -299,7 +308,7 @@ function App() {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={topRows} layout="vertical" margin={{ left: 12, right: 24 }}>
                 <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-                <XAxis type="number" tickFormatter={(value) => `${value / 10000}萬`} />
+                <XAxis type="number" tickFormatter={formatAxisNumber} />
                 <YAxis type="category" width={92} dataKey="marketZh" />
                 <Tooltip formatter={(value) => formatNumber(value)} />
                 <Bar dataKey="arrivals" radius={[0, 4, 4, 0]} isAnimationActive={false}>
@@ -332,8 +341,8 @@ function App() {
         <div className="panel panel-wide">
           <div className="panel-head">
             <div>
-              <h2>主要來源趨勢</h2>
-              <p>用年度資料看市場恢復與投放權重變化。</p>
+              <h2>{isRealtime ? '來源快照' : '主要來源趨勢'}</h2>
+              <p>{isRealtime ? '近即時資料為快照，趨勢需部署排程持續保存。' : '用年度資料看市場恢復與投放權重變化。'}</p>
             </div>
           </div>
           <div className="chart-box">
@@ -341,7 +350,7 @@ function App() {
               <AreaChart data={trendData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="year" />
-                <YAxis tickFormatter={(value) => `${value / 10000}萬`} />
+                <YAxis tickFormatter={formatAxisNumber} />
                 <Tooltip formatter={(value) => formatNumber(value)} />
                 <Legend />
                 {marketRows.slice(0, 5).map((row, index) => (
@@ -385,9 +394,10 @@ function App() {
         <div className="panel-head">
           <div>
             <h2>市場明細</h2>
-            <p>資料源: {dataset.source?.title || 'unknown'}。官方統計採月發布，預告時效通常約 40 日；真正同日即時資料需要移民署或商業資料 feed。</p>
+            <p>資料源: {dataset.source?.title || 'unknown'}。{isRealtime ? '公開 OpenData 為近 3 小時入境預報，依國籍、年齡、性別、機場細格彙總；正式商用仍建議自行部署並保存歷史快照。' : '官方統計採月發布，預告時效通常約 40 日。'}</p>
           </div>
           <div className="source-links">
+            <a href="https://data.gov.tw/dataset/88851" target="_blank" rel="noreferrer">移民署 OpenData</a>
             <a href={officialMonthlyUrl} target="_blank" rel="noreferrer">月資料頁</a>
             <a href={releaseCalendarUrl} target="_blank" rel="noreferrer">發布規則</a>
           </div>

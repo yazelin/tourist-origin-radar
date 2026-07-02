@@ -6,22 +6,33 @@
 
 ## 可行性判斷
 
-能做，但「即時」要分層：
+能做，但「即時」要分層。這個 demo 目前採用最接近即時的公開資料：
 
-- 公開可穩定使用的資料：交通部觀光署「歷年來台旅客居住地統計」CSV，以及觀光署月資料頁。
-- 官方統計節奏：國家統計預告寫明來臺旅客資料為月發布，時效約 40 日。
-- 真正同日或近即時的入境來源比例：需要內政部移民署資料、機場、電信、支付或廣告平台等商業資料 feed，公開網頁不能直接承諾。
+- 近即時公開資料：內政部移民署「入境人次預報」OpenData，資料集說明為近 3 小時入境人次、每小時更新，欄位含國籍、性別、年齡、機場。
+- 月級正式統計：交通部觀光署「來臺旅客居住地」月資料，適合校準正式旅遊統計。
+- 年度背景資料：交通部觀光署「歷年來台旅客居住地統計」CSV，適合長期趨勢。
+- 真正商用即時：若要接查驗系統、航班訂位、電信漫遊、支付或廣告平台資料，仍需自行取得授權或商業合作。
 
-因此這個 repo 先做「最新官方資料 + 行銷決策 dashboard」，並把資料更新管線包成 Vercel serverless API，未來可替換成更即時的 feed。
+因此這個 repo 做成「移民署近即時 OpenData + 行銷決策 dashboard」，並把資料更新管線包成 Vercel serverless API，未來可替換成授權或商業 feed。
 
 ## 功能
 
-- Vercel serverless API proxy：`/api/residence/annual` 抓官方 CSV，並設定 CDN 快取。
-- 來源國比例排行、Top N 篩選、年度趨勢、區域佔比。
+- Vercel serverless API proxy：`/api/arrivals/realtime` 抓移民署入境人次預報，依國籍加總並設定 CDN 快取。
+- 備援 API：`/api/residence/annual` 抓觀光署年度 CSV。
+- 來源國比例排行、Top N 篩選、來源快照、機場涵蓋狀態。
 - 提醒規則：來源佔比達門檻或年增達門檻，支援瀏覽器通知。
 - CSV / JSON 匯出。
 - 官方 CSV 手動匯入，方便離線 demo 或資料格式驗證。
 - API 不可用時使用內建 2023-2025 樣本，確保 demo 不空白。
+
+## 參考與整合
+
+GitHub 上已有開發者使用移民署 APIS 做資料收集，但不是完整行銷產品：
+
+- `eric7578/pax-graph`：抓移民署入出境 endpoint，依國籍與年齡分組保存 logs。
+- `ianlkl11234s/gis-data-collectors`：整理移民署 APIS collector 與 endpoint 探勘結果。
+
+本 repo 參考它們的公開 endpoint 使用方式與 group-by 思路，整合成可部署的產品 demo：即時比例圖表、提醒、匯出、資料來源狀態與自行部署說明。
 
 ## 免費部署建議
 
@@ -42,7 +53,7 @@
 - `DATA_SOURCE_TOKEN`
 - `CACHE_TTL_SECONDS`
 
-再修改 `api/residence/annual.js`。
+再修改 `api/arrivals/realtime.js` 或新增自己的 adapter。
 
 ### GitHub Pages
 
@@ -77,6 +88,8 @@ npm run preview
 
 ## 資料來源
 
+- 移民署桃園機場入境人次預報：https://data.gov.tw/dataset/88851
+- 移民署 OpenData API docs：https://opendata.immigration.gov.tw/v2/api-docs
 - 交通部觀光署開放資料：https://stat.taiwan.net.tw/data/opendata/7
 - 來臺旅客居住地月資料頁：https://admin.taiwan.net.tw/businessinfo/IssuePage?a=12124
 - 國家統計發布規則：https://www.stat.gov.tw/News_NoticeCalendar_Content.aspx?MetaI_D=732
