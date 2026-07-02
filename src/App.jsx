@@ -171,8 +171,8 @@ function App() {
     }
 
     if (realtimeDataset) {
-      setStatus('live')
-      setStatusText(`近即時 ${formatNumber(realtimeDataset.source?.totalForeign)} 人次；多年趨勢 ${annualRange}`)
+      setStatus(realtimeDataset.source?.snapshot ? 'snapshot' : 'live')
+      setStatusText(`${realtimeDataset.source?.snapshot ? '近即時快照' : '近即時'} ${formatNumber(realtimeDataset.source?.totalForeign)} 人次；多年趨勢 ${annualRange}`)
       return
     }
 

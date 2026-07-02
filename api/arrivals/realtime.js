@@ -1,5 +1,6 @@
 import { execFile } from 'node:child_process'
 import { promisify } from 'node:util'
+import { realtimeSnapshot } from './realtimeSnapshot.js'
 
 const IMMIGRATION_API_BASE = 'https://opendata.immigration.gov.tw/APIS'
 const PERIOD = '近3小時'
@@ -16,6 +17,14 @@ const INBOUND_ENDPOINTS = [
   { code: 'MZG1', label: '澎湖馬公機場' },
   { code: 'PIF1', label: '屏東機場' },
   { code: 'TTT1', label: '臺東機場' },
+  { code: 'KNH1', label: '金門機場' },
+  { code: 'LZN1', label: '馬祖南竿機場' },
+  { code: 'MFK1', label: '馬祖北竿機場' },
+  { code: 'WOT1', label: '澎湖望安機場' },
+  { code: 'CMJ1', label: '澎湖七美機場' },
+  { code: 'GNI1', label: '綠島機場' },
+  { code: 'KYD1', label: '蘭嶼機場' },
+  { code: 'HCN1', label: '恆春機場' },
 ]
 
 const countryNames = {
@@ -138,16 +147,15 @@ export default async function handler(_request, response) {
   }))
 
   if (totalAll === 0) {
-    response.status(502).json({
-      error: 'IMMIGRATION_APIS_NO_DATA',
-      message: '移民署 APIS 未回傳可用入境資料；常見原因是部署所在雲端 IP 被上游封鎖或所有 endpoint 暫無資料。',
+    response.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600')
+    response.setHeader('X-Data-Fallback', 'snapshot')
+    response.status(200).json({
+      ...realtimeSnapshot,
       source: {
-        mode: 'realtime',
-        title: '移民署入境人次預報 OpenData',
-        url: 'https://data.gov.tw/dataset/88851',
-        apiBase: IMMIGRATION_API_BASE,
-        fetchedAt,
-        endpoints: endpointStatus,
+        ...realtimeSnapshot.source,
+        upstreamFetchedAt: fetchedAt,
+        upstreamEndpoints: endpointStatus,
+        note: 'Vercel production 目前無法直連移民署 APIS；此回應使用本機成功抓取的近即時快照備援，供公開 demo 展示資料形態。',
       },
     })
     return

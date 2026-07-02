@@ -1,0 +1,42 @@
+name: Update realtime snapshot
+
+on:
+  schedule:
+    - cron: '17 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Update snapshot from Immigration APIS
+        id: snapshot
+        continue-on-error: true
+        run: node scripts/update-realtime-snapshot.mjs
+
+      - name: Stop if upstream is unavailable
+        if: steps.snapshot.outcome != 'success'
+        run: |
+          echo "Immigration APIS unavailable from this runner; keeping existing snapshot."
+          exit 0
+
+      - name: Commit snapshot
+        run: |
+          if git diff --quiet -- api/arrivals/realtimeSnapshot.js; then
+            echo "Snapshot unchanged."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add api/arrivals/realtimeSnapshot.js
+          git commit -m "chore: update realtime snapshot"
+          git push

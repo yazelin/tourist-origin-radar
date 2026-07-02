@@ -87,6 +87,10 @@ h2 {
   background: #5b6c8f;
 }
 
+.status-pill.snapshot span {
+  background: #f3a712;
+}
+
 .control-band {
   display: grid;
   grid-template-columns: minmax(104px, 0.55fr) minmax(108px, 0.55fr) minmax(200px, 1.5fr) minmax(130px, 0.8fr) minmax(120px, 0.7fr) minmax(100px, auto) repeat(2, auto);
