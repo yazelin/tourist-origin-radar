@@ -1,4 +1,10 @@
 {
+  "functions": {
+    "api/**/*.js": {
+      "regions": ["hkg1"],
+      "maxDuration": 30
+    }
+  },
   "rewrites": [
     {
       "source": "/api/(.*)",
