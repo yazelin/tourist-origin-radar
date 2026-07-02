@@ -1,7 +1,9 @@
 .app-shell {
-  min-height: 100svh;
+  height: 100svh;
   background: #f5f2ea;
-  overflow-x: hidden;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .topbar {
@@ -9,7 +11,7 @@
   align-items: flex-end;
   justify-content: space-between;
   gap: 24px;
-  padding: 28px 32px 22px;
+  padding: 16px 24px 14px;
   background:
     linear-gradient(90deg, rgba(31, 122, 140, 0.1), rgba(228, 87, 46, 0.08)),
     #fbfaf6;
@@ -35,14 +37,14 @@ p {
 
 h1 {
   color: #1d2528;
-  font-size: 32px;
+  font-size: 25px;
   line-height: 1.15;
   font-weight: 760;
 }
 
 h2 {
   color: #1d2528;
-  font-size: 18px;
+  font-size: 15px;
   line-height: 1.2;
 }
 
@@ -52,7 +54,7 @@ h2 {
   gap: 10px;
   min-height: 38px;
   max-width: 430px;
-  padding: 8px 12px;
+  padding: 7px 10px;
   border: 1px solid #c7c0b3;
   border-radius: 6px;
   background: #fffdf8;
@@ -83,10 +85,10 @@ h2 {
 
 .control-band {
   display: grid;
-  grid-template-columns: minmax(120px, 0.7fr) minmax(220px, 1.7fr) minmax(150px, 1fr) minmax(138px, 0.8fr) repeat(2, auto);
+  grid-template-columns: minmax(120px, 0.7fr) minmax(220px, 1.7fr) minmax(150px, 1fr) minmax(138px, 0.8fr) minmax(110px, auto) repeat(2, auto);
   align-items: end;
-  gap: 12px;
-  padding: 16px 32px;
+  gap: 9px;
+  padding: 10px 24px;
   background: #ffffff;
   border-bottom: 1px solid #ded8cb;
 }
@@ -102,7 +104,7 @@ label {
 select,
 input,
 button {
-  min-height: 38px;
+  min-height: 32px;
   border: 1px solid #c7c0b3;
   border-radius: 6px;
   background: #fffdf8;
@@ -134,6 +136,59 @@ button:hover {
   color: #1f7a8c;
 }
 
+.toggle-field {
+  min-width: 112px;
+}
+
+.toggle.active {
+  border-color: #1f7a8c;
+  background: #e7f2f3;
+  color: #145d6b;
+}
+
+.filter-band {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 7px 24px;
+  background: #fbfaf6;
+  border-bottom: 1px solid #ded8cb;
+}
+
+.filter-band > span {
+  color: #5e6670;
+  font-size: 12px;
+  font-weight: 800;
+  margin-right: 4px;
+}
+
+.filter-band button {
+  min-height: 30px;
+  padding: 0 10px;
+  font-size: 13px;
+}
+
+.check-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 30px;
+  padding: 0 10px;
+  border: 1px solid #c7c0b3;
+  border-radius: 999px;
+  background: #fffdf8;
+  color: #263238;
+  font-size: 13px;
+}
+
+.check-pill input {
+  min-height: 0;
+  width: 14px;
+  height: 14px;
+  padding: 0;
+}
+
 .search-field {
   position: relative;
 }
@@ -159,8 +214,8 @@ button:hover {
 
 .metric-grid article {
   display: grid;
-  gap: 7px;
-  padding: 20px 32px;
+  gap: 4px;
+  padding: 10px 24px;
   background: #fbfaf6;
 }
 
@@ -173,41 +228,71 @@ button:hover {
 
 .metric-grid strong {
   color: #1d2528;
-  font-size: 30px;
+  font-size: 23px;
   line-height: 1.05;
 }
 
 .dashboard-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.45fr) minmax(320px, 0.75fr);
-  gap: 16px;
-  padding: 16px 32px;
+  grid-template-columns: minmax(0, 1.15fr) minmax(260px, 0.72fr) minmax(360px, 0.9fr);
+  grid-template-rows: repeat(2, minmax(210px, 1fr));
+  align-items: stretch;
+  flex: 1;
+  min-height: 0;
+  gap: 10px;
+  padding: 10px 24px 14px;
+}
+
+.dashboard-grid > * {
+  height: 100%;
 }
 
 .panel,
 .table-band {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
   max-width: 100%;
   background: #fffdf8;
   border: 1px solid #d8d2c5;
   border-radius: 8px;
 }
 
-.panel-wide {
+.panel-rank {
+  grid-row: 1 / -1;
   min-width: 0;
+}
+
+.panel-share,
+.panel-trend,
+.alert-panel,
+.table-panel {
+  min-width: 0;
+}
+
+.table-panel {
+  grid-column: 3;
+  grid-row: 1 / -1;
 }
 
 .panel-head {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 16px;
-  padding: 16px;
+  gap: 10px;
+  padding: 10px 12px;
   border-bottom: 1px solid #e5dfd2;
+  flex: 0 0 auto;
+}
+
+.table-panel .panel-head {
+  display: grid;
+  grid-template-columns: 1fr auto;
 }
 
 .panel-head p {
-  margin-top: 5px;
-  font-size: 13px;
+  margin-top: 3px;
+  font-size: 12px;
 }
 
 .button-row,
@@ -215,6 +300,11 @@ button:hover {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+}
+
+.table-panel .source-links {
+  display: grid;
+  gap: 5px;
 }
 
 .source-links a {
@@ -225,30 +315,33 @@ button:hover {
 
 .chart-box {
   width: 100%;
-  height: 310px;
-  padding: 12px;
+  flex: 1 1 0;
+  min-height: 0;
+  height: 100%;
+  padding: 8px;
   box-sizing: border-box;
 }
 
 .chart-box.large {
-  height: 430px;
+  height: auto;
 }
 
 .alert-panel {
-  align-self: start;
+  min-height: 0;
 }
 
 .alert-list {
   display: grid;
-  gap: 10px;
-  padding: 14px 16px 18px;
+  gap: 7px;
+  padding: 10px 12px;
+  overflow: auto;
 }
 
 .alert-item {
   display: grid;
   grid-template-columns: 1fr auto;
-  gap: 3px 10px;
-  padding: 12px;
+  gap: 2px 8px;
+  padding: 8px;
   border: 1px solid #e4d9c3;
   border-radius: 6px;
   background: #fbfaf6;
@@ -277,23 +370,24 @@ button:hover {
 }
 
 .table-band {
-  margin: 0 32px 32px;
   overflow: hidden;
 }
 
 .table-wrap {
   overflow: auto;
+  flex: 1 1 0;
+  min-height: 0;
 }
 
 table {
   width: 100%;
-  min-width: 760px;
+  min-width: 620px;
   border-collapse: collapse;
 }
 
 th,
 td {
-  padding: 12px 16px;
+  padding: 8px 10px;
   border-bottom: 1px solid #e8e2d6;
   text-align: left;
   white-space: nowrap;
@@ -307,6 +401,7 @@ th {
 
 td {
   color: #263238;
+  font-size: 13px;
 }
 
 td span {
@@ -337,14 +432,28 @@ td span {
 }
 
 @media (max-width: 1100px) {
-  .control-band,
-  .dashboard-grid {
+  .control-band {
     grid-template-columns: 1fr 1fr;
   }
 
-  .panel-wide,
+  .dashboard-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(330px, 0.9fr);
+    grid-template-rows: repeat(2, minmax(210px, 1fr));
+  }
+
+  .panel-rank {
+    grid-row: 1 / -1;
+  }
+
+  .table-panel {
+    grid-column: 2;
+    grid-row: 1 / -1;
+  }
+
+  .panel-share,
+  .panel-trend,
   .alert-panel {
-    grid-column: 1 / -1;
+    display: none;
   }
 
   .metric-grid {
@@ -353,6 +462,12 @@ td span {
 }
 
 @media (max-width: 720px) {
+  .app-shell {
+    height: auto;
+    min-height: 100svh;
+    overflow: visible;
+  }
+
   .topbar,
   .panel-head {
     flex-direction: column;
@@ -376,13 +491,30 @@ td span {
     grid-template-columns: 1fr;
   }
 
+  .dashboard-grid {
+    display: grid;
+    grid-template-rows: auto;
+    overflow: visible;
+  }
+
+  .panel-rank,
+  .table-panel {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  .panel-share,
+  .panel-trend,
+  .alert-panel {
+    display: flex;
+  }
+
   .metric-grid article {
     padding: 18px 16px;
   }
 
   .table-band {
-    margin-left: 16px;
-    margin-right: 16px;
+    min-height: 420px;
   }
 
   .chart-box.large {

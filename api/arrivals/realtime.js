@@ -1,5 +1,9 @@
+import { execFile } from 'node:child_process'
+import { promisify } from 'node:util'
+
 const IMMIGRATION_API_BASE = 'https://opendata.immigration.gov.tw/APIS'
 const PERIOD = '近3小時'
+const execFileAsync = promisify(execFile)
 
 const INBOUND_ENDPOINTS = [
   { code: 'TPE1', label: '桃園機場' },
@@ -49,19 +53,23 @@ function marketName(code) {
 }
 
 async function fetchEndpoint(endpoint) {
-  const controller = new AbortController()
-  const timer = setTimeout(() => controller.abort(), 8000)
   try {
-    const response = await fetch(`${IMMIGRATION_API_BASE}/${endpoint.code}`, {
-      signal: controller.signal,
-      headers: {
-        Accept: 'application/json,text/plain;q=0.9,*/*;q=0.1',
-        'User-Agent': 'Mozilla/5.0 tourist-origin-radar/1.0',
-      },
-    })
-    const text = await response.text()
-    if (!response.ok) throw new Error(`HTTP ${response.status}`)
-    const rows = JSON.parse(text)
+    const { stdout } = await execFileAsync(
+      'curl',
+      [
+        '-sS',
+        '-L',
+        '--max-time',
+        '12',
+        '-A',
+        'Mozilla/5.0 tourist-origin-radar/1.0',
+        '-H',
+        'Accept: application/json,text/plain,*/*',
+        `${IMMIGRATION_API_BASE}/${endpoint.code}`,
+      ],
+      { timeout: 15000, maxBuffer: 8 * 1024 * 1024 },
+    )
+    const rows = JSON.parse(stdout)
     if (!Array.isArray(rows)) throw new Error('payload is not an array')
     return { endpoint, rows, error: null }
   } catch (error) {
@@ -70,8 +78,6 @@ async function fetchEndpoint(endpoint) {
       rows: [],
       error: error instanceof Error ? error.message : 'unknown error',
     }
-  } finally {
-    clearTimeout(timer)
   }
 }
 
@@ -93,9 +99,6 @@ export default async function handler(_request, response) {
       totalAll += pax
       airportTotals.set(airport, (airportTotals.get(airport) || 0) + pax)
 
-      // Marketing source mix is more useful when returning Taiwanese nationals are not the top bucket.
-      if (nationality === 'TWN') continue
-
       const current = grouped.get(nationality) || {
         code: nationality,
         count: 0,
@@ -116,12 +119,16 @@ export default async function handler(_request, response) {
         marketZh: names.marketZh,
         marketEn: names.marketEn,
         nationality: item.code,
+        isDomestic: item.code === 'TWN',
         airports: item.airports,
         values: { [PERIOD]: item.count },
       }
     })
 
   const total = rows.reduce((sum, row) => sum + row.values[PERIOD], 0)
+  const totalForeign = rows
+    .filter((row) => !row.isDomestic)
+    .reduce((sum, row) => sum + row.values[PERIOD], 0)
   const endpointStatus = results.map((result) => ({
     code: result.endpoint.code,
     label: result.endpoint.label,
@@ -159,10 +166,10 @@ export default async function handler(_request, response) {
       fetchedAt,
       cadence: '近3小時入境人次；資料集說明為每小時更新',
       totalAll,
-      totalForeign: total,
+      totalForeign,
       endpoints: endpointStatus,
       airportTotals: Object.fromEntries([...airportTotals.entries()].sort()),
-      note: '來源資料包含本國籍入境；本 dashboard 的來源國比例預設排除 TWN，以呈現行銷常用外籍來源市場。',
+      note: '來源資料包含本國籍入境；dashboard 預設排除 TWN，以呈現行銷常用外籍來源市場，可在設定中切換。',
     },
   })
 }

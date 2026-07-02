@@ -15,14 +15,12 @@ import {
   YAxis,
 } from 'recharts'
 import {
-  Bell,
   Download,
   FileUp,
   Globe2,
   RefreshCcw,
   Search,
   Share2,
-  TrendingUp,
 } from 'lucide-react'
 import Papa from 'papaparse'
 import { fallbackResidence } from './data/fallbackResidence'
@@ -99,39 +97,56 @@ function downloadFile(filename, content, type) {
   URL.revokeObjectURL(url)
 }
 
+async function fetchJson(path) {
+  const response = await fetch(path)
+  if (!response.ok) throw new Error(`API ${response.status}`)
+  const contentType = response.headers.get('content-type') || ''
+  if (!contentType.includes('application/json')) {
+    throw new Error('本機 Vite 未啟動 Vercel API')
+  }
+  return response.json()
+}
+
 function App() {
   const [dataset, setDataset] = useState(fallbackResidence)
+  const [annualDataset, setAnnualDataset] = useState(fallbackResidence)
   const [status, setStatus] = useState('loading')
   const [statusText, setStatusText] = useState('正在讀取官方開放資料')
   const [year, setYear] = useState(fallbackResidence.years.at(-1))
   const [query, setQuery] = useState('')
   const [topN, setTopN] = useState(10)
   const [threshold, setThreshold] = useState(8)
-  const [noticeEnabled, setNoticeEnabled] = useState(false)
+  const [includeDomestic, setIncludeDomestic] = useState(false)
+  const [selectedAirports, setSelectedAirports] = useState([])
   const fileInputRef = useRef(null)
 
   useEffect(() => {
     let cancelled = false
     async function load() {
+      let annualData = fallbackResidence
+      let annualError = null
       try {
-        const response = await fetch('/api/arrivals/realtime')
-        if (!response.ok) throw new Error(`API ${response.status}`)
-        const contentType = response.headers.get('content-type') || ''
-        if (!contentType.includes('application/json')) {
-          throw new Error('本機 Vite 未啟動 Vercel API')
-        }
-        const payload = await response.json()
+        annualData = await fetchJson('/api/residence/annual')
+      } catch (error) {
+        annualError = error
+      }
+
+      try {
+        const payload = await fetchJson('/api/arrivals/realtime')
         if (cancelled) return
+        setAnnualDataset(annualData)
         setDataset(payload)
         setYear(payload.years.at(-1))
+        setSelectedAirports(Object.keys(payload.source?.airportTotals || {}))
         setStatus('live')
-        setStatusText(`已讀取移民署近即時 OpenData，外籍來源 ${formatNumber(payload.source?.totalForeign)} 人次`)
+        setStatusText(`近即時 ${formatNumber(payload.source?.totalForeign)} 人次；多年趨勢 ${annualData.years.at(0)}-${annualData.years.at(-1)}`)
       } catch (error) {
         if (cancelled) return
-        setDataset(fallbackResidence)
-        setYear(fallbackResidence.years.at(-1))
+        setAnnualDataset(annualData)
+        setDataset(annualData)
+        setYear(annualData.years.at(-1))
         setStatus('fallback')
-        setStatusText(`使用年度備援樣本。部署到 Vercel 或執行 vercel dev 後會啟用近即時 API: ${error.message}`)
+        setStatusText(`近即時 API 未啟用: ${error.message}；年度趨勢${annualError ? '使用備援樣本' : `已載入 ${annualData.years.at(0)}-${annualData.years.at(-1)}`}`)
       }
     }
     load()
@@ -145,34 +160,53 @@ function App() {
   const total = dataset.totals?.[selectedYear] || dataset.rows.reduce((sum, row) => sum + (row.values[selectedYear] || 0), 0)
   const previousTotal = dataset.totals?.[previousYear]
   const isRealtime = dataset.source?.mode === 'realtime'
+  const airportOptions = useMemo(() => Object.keys(dataset.source?.airportTotals || {}).sort(), [dataset.source])
+  const activeAirportSet = useMemo(() => new Set(selectedAirports.length ? selectedAirports : airportOptions), [airportOptions, selectedAirports])
 
   const marketRows = useMemo(() => {
     return dataset.rows
       .map((row) => {
-        const arrivals = row.values[selectedYear] || 0
+        const arrivals = isRealtime && row.airports
+          ? Object.entries(row.airports).reduce((sum, [airport, count]) => activeAirportSet.has(airport) ? sum + count : sum, 0)
+          : row.values[selectedYear] || 0
         const previous = row.values[previousYear] || 0
-        const share = total ? (arrivals / total) * 100 : 0
         const yoy = previous ? ((arrivals - previous) / previous) * 100 : null
-        return { ...row, arrivals, previous, share, yoy }
+        return { ...row, arrivals, previous, yoy }
       })
+      .filter((row) => includeDomestic || !row.isDomestic)
       .filter((row) => row.arrivals > 0)
       .filter((row) => `${row.marketZh} ${row.marketEn} ${row.region}`.toLowerCase().includes(query.toLowerCase()))
       .sort((a, b) => b.arrivals - a.arrivals)
-  }, [dataset.rows, previousYear, query, selectedYear, total])
+  }, [activeAirportSet, dataset.rows, includeDomestic, isRealtime, previousYear, query, selectedYear])
 
-  const topRows = marketRows.slice(0, topN)
-  const topMarket = marketRows[0]
-  const asiaShare = marketRows
+  const visibleTotal = marketRows.reduce((sum, row) => sum + row.arrivals, 0) || total
+  const marketRowsWithShare = useMemo(() => marketRows.map((row) => ({
+    ...row,
+    share: visibleTotal ? (row.arrivals / visibleTotal) * 100 : 0,
+  })), [marketRows, visibleTotal])
+
+  const topRows = marketRowsWithShare.slice(0, topN)
+  const topMarket = marketRowsWithShare[0]
+  const asiaShare = marketRowsWithShare
     .filter((row) => row.region?.includes('亞洲'))
     .reduce((sum, row) => sum + row.share, 0)
   const totalYoy = previousTotal ? ((total - previousTotal) / previousTotal) * 100 : null
-  const alertRows = marketRows.filter((row) => row.share >= threshold || (row.yoy != null && row.yoy >= threshold * 2)).slice(0, 6)
+  const alertRows = marketRowsWithShare.filter((row) => row.share >= threshold || (row.yoy != null && row.yoy >= threshold * 2)).slice(0, 6)
   const activeEndpoints = dataset.source?.endpoints?.filter((endpoint) => endpoint.ok && endpoint.rows > 1).length
   const totalAll = dataset.source?.totalAll
 
-  const trendData = dataset.years.map((item) => {
+  const annualRowsByName = useMemo(() => new Map(annualDataset.rows.flatMap((row) => [
+    [row.marketZh, row],
+    [row.marketEn, row],
+  ])), [annualDataset.rows])
+  const trendRows = marketRowsWithShare
+    .map((row) => annualRowsByName.get(row.marketZh) || annualRowsByName.get(row.marketEn))
+    .filter(Boolean)
+    .filter((row, index, rows) => rows.findIndex((item) => item.marketZh === row.marketZh) === index)
+    .slice(0, 5)
+  const trendData = annualDataset.years.map((item) => {
     const point = { year: item }
-    marketRows.slice(0, 5).forEach((row) => {
+    trendRows.forEach((row) => {
       point[row.marketZh] = row.values[item] || 0
     })
     return point
@@ -180,7 +214,7 @@ function App() {
 
   function handleExportCsv() {
     const header = ['period', 'region', 'market_zh', 'market_en', 'nationality', 'arrivals', 'share_percent', 'yoy_percent']
-    const rows = marketRows.map((row) => [
+    const rows = marketRowsWithShare.map((row) => [
       selectedYear,
       row.region,
       row.marketZh,
@@ -197,9 +231,16 @@ function App() {
   function handleExportJson() {
     downloadFile(
       `tourist-origin-${selectedYear}.json`,
-      JSON.stringify({ year: selectedYear, total, rows: marketRows, source: dataset.source }, null, 2),
+      JSON.stringify({ period: selectedYear, total: visibleTotal, rows: marketRowsWithShare, source: dataset.source }, null, 2),
       'application/json;charset=utf-8',
     )
+  }
+
+  function toggleAirport(airport) {
+    setSelectedAirports((current) => {
+      const source = current.length ? current : airportOptions
+      return source.includes(airport) ? source.filter((item) => item !== airport) : [...source, airport].sort()
+    })
   }
 
   async function handleFileUpload(event) {
@@ -208,6 +249,7 @@ function App() {
     try {
       const csv = await file.text()
       const parsed = parseResidenceCsv(csv)
+      setAnnualDataset(parsed)
       setDataset(parsed)
       setYear(parsed.years.at(-1))
       setStatus('imported')
@@ -215,18 +257,6 @@ function App() {
     } catch (error) {
       setStatus('fallback')
       setStatusText(`CSV 匯入失敗: ${error.message}`)
-    }
-  }
-
-  async function handleEnableNotice() {
-    setNoticeEnabled(true)
-    if ('Notification' in window && Notification.permission === 'default') {
-      await Notification.requestPermission()
-    }
-    if ('Notification' in window && Notification.permission === 'granted' && alertRows[0]) {
-      new Notification('旅客來源比例提醒', {
-        body: `${alertRows[0].marketZh} 佔比 ${formatPercent(alertRows[0].share)}，已達提醒門檻。`,
-      })
     }
   }
 
@@ -264,16 +294,37 @@ function App() {
           <input type="number" min="1" max="50" value={threshold} onChange={(event) => setThreshold(Number(event.target.value))} />
           <span>%</span>
         </label>
+        {isRealtime && (
+          <label className="toggle-field">
+            視角
+            <button type="button" className={includeDomestic ? 'toggle active' : 'toggle'} onClick={() => setIncludeDomestic((value) => !value)}>
+              {includeDomestic ? '全部入境' : '外籍客源'}
+            </button>
+          </label>
+        )}
         <button type="button" onClick={() => window.location.reload()} title="重新整理資料"><RefreshCcw size={18} />重新整理</button>
         <button type="button" onClick={() => fileInputRef.current?.click()} title="匯入官方 CSV"><FileUp size={18} />匯入</button>
         <input ref={fileInputRef} className="visually-hidden" type="file" accept=".csv,text/csv" onChange={handleFileUpload} />
       </section>
 
+      {isRealtime && airportOptions.length > 0 && (
+        <section className="filter-band" aria-label="機場篩選">
+          <span>機場</span>
+          {airportOptions.map((airport) => (
+            <label key={airport} className="check-pill">
+              <input type="checkbox" checked={activeAirportSet.has(airport)} onChange={() => toggleAirport(airport)} />
+              {airport}
+            </label>
+          ))}
+          <button type="button" onClick={() => setSelectedAirports(airportOptions)}>全選</button>
+        </section>
+      )}
+
       <section className="metric-grid" aria-label="關鍵指標">
         <article>
-          <span>{isRealtime ? '外籍來源人次' : '總入境人次'}</span>
-          <strong>{formatNumber(total)}</strong>
-          <small>{isRealtime && totalAll ? `全部入境 ${formatNumber(totalAll)}，已排除 TWN` : totalYoy == null ? '無前期比較' : `年增 ${formatPercent(totalYoy)}`}</small>
+          <span>{isRealtime ? (includeDomestic ? '全部入境人次' : '外籍來源人次') : '總入境人次'}</span>
+          <strong>{formatNumber(visibleTotal)}</strong>
+          <small>{isRealtime && totalAll ? `全部入境 ${formatNumber(totalAll)}，目前視角 ${includeDomestic ? '含 TWN' : '排除 TWN'}` : totalYoy == null ? '無前期比較' : `年增 ${formatPercent(totalYoy)}`}</small>
         </article>
         <article>
           <span>最大來源</span>
@@ -288,12 +339,12 @@ function App() {
         <article>
           <span>提醒命中</span>
           <strong>{alertRows.length}</strong>
-          <small>{noticeEnabled ? '瀏覽器通知已嘗試啟用' : '依佔比與年增門檻'}</small>
+          <small>依佔比與年增門檻</small>
         </article>
       </section>
 
       <section className="dashboard-grid">
-        <div className="panel panel-wide">
+        <div className="panel panel-rank">
           <div className="panel-head">
             <div>
               <h2>來源國比例排行</h2>
@@ -319,7 +370,7 @@ function App() {
           </div>
         </div>
 
-        <div className="panel">
+        <div className="panel panel-share">
           <div className="panel-head">
             <div>
               <h2>市場佔比</h2>
@@ -338,11 +389,11 @@ function App() {
           </div>
         </div>
 
-        <div className="panel panel-wide">
+        <div className="panel panel-trend">
           <div className="panel-head">
             <div>
-              <h2>{isRealtime ? '來源快照' : '主要來源趨勢'}</h2>
-              <p>{isRealtime ? '近即時資料為快照，趨勢需部署排程持續保存。' : '用年度資料看市場恢復與投放權重變化。'}</p>
+              <h2>多年來源趨勢</h2>
+              <p>年度資料 {annualDataset.years.at(0)}-{annualDataset.years.at(-1)}，對照目前 Top 來源。</p>
             </div>
           </div>
           <div className="chart-box">
@@ -353,7 +404,7 @@ function App() {
                 <YAxis tickFormatter={formatAxisNumber} />
                 <Tooltip formatter={(value) => formatNumber(value)} />
                 <Legend />
-                {marketRows.slice(0, 5).map((row, index) => (
+                {trendRows.map((row, index) => (
                   <Area
                     key={row.marketZh}
                     type="monotone"
@@ -369,29 +420,8 @@ function App() {
           </div>
         </div>
 
-        <aside className="panel alert-panel">
+        <section className="table-band panel table-panel">
           <div className="panel-head">
-            <div>
-              <h2>提醒</h2>
-              <p>佔比達 {threshold}% 或年增達 {threshold * 2}%。</p>
-            </div>
-            <button type="button" onClick={handleEnableNotice}><Bell size={17} />啟用</button>
-          </div>
-          <div className="alert-list">
-            {alertRows.length === 0 && <p className="empty">目前沒有市場達到提醒門檻。</p>}
-            {alertRows.map((row) => (
-              <div key={row.marketEn} className="alert-item">
-                <strong>{row.marketZh}</strong>
-                <span>{formatPercent(row.share)} share</span>
-                <small>{row.yoy == null ? '無年增資料' : <><TrendingUp size={14} />年增 {formatPercent(row.yoy)}</>}</small>
-              </div>
-            ))}
-          </div>
-        </aside>
-      </section>
-
-      <section className="table-band">
-        <div className="panel-head">
           <div>
             <h2>市場明細</h2>
             <p>資料源: {dataset.source?.title || 'unknown'}。{isRealtime ? '公開 OpenData 為近 3 小時入境預報，依國籍、年齡、性別、機場細格彙總；正式商用仍建議自行部署並保存歷史快照。' : '官方統計採月發布，預告時效通常約 40 日。'}</p>
@@ -401,8 +431,8 @@ function App() {
             <a href={officialMonthlyUrl} target="_blank" rel="noreferrer">月資料頁</a>
             <a href={releaseCalendarUrl} target="_blank" rel="noreferrer">發布規則</a>
           </div>
-        </div>
-        <div className="table-wrap">
+          </div>
+          <div className="table-wrap">
           <table>
             <thead>
               <tr>
@@ -415,7 +445,7 @@ function App() {
               </tr>
             </thead>
             <tbody>
-              {marketRows.map((row, index) => (
+              {marketRowsWithShare.map((row, index) => (
                 <tr key={`${row.region}-${row.marketEn}`}>
                   <td>{index + 1}</td>
                   <td><strong>{row.marketZh}</strong><span>{row.marketEn}</span></td>
@@ -429,7 +459,8 @@ function App() {
               ))}
             </tbody>
           </table>
-        </div>
+          </div>
+        </section>
       </section>
     </main>
   )
