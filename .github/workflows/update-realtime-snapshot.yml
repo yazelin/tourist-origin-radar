@@ -20,16 +20,32 @@ jobs:
 
       - name: Update snapshot from Immigration APIS
         id: snapshot
-        continue-on-error: true
-        run: node scripts/update-realtime-snapshot.mjs
+        run: |
+          set +e
+          node scripts/update-realtime-snapshot.mjs
+          code=$?
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+
+          if [ "$code" -eq 0 ]; then
+            echo "Snapshot update succeeded."
+            exit 0
+          fi
+
+          if [ "$code" -eq 2 ]; then
+            echo "Immigration APIS unavailable from this runner; keeping existing snapshot."
+            exit 0
+          fi
+
+          exit "$code"
 
       - name: Stop if upstream is unavailable
-        if: steps.snapshot.outcome != 'success'
+        if: steps.snapshot.outputs.exit_code == '2'
         run: |
           echo "Immigration APIS unavailable from this runner; keeping existing snapshot."
           exit 0
 
       - name: Commit snapshot
+        if: steps.snapshot.outputs.exit_code == '0'
         run: |
           if git diff --quiet -- api/arrivals/realtimeSnapshot.js; then
             echo "Snapshot unchanged."
