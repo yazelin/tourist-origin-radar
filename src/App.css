@@ -83,9 +83,13 @@ h2 {
   background: #1f7a8c;
 }
 
+.status-pill.annual span {
+  background: #5b6c8f;
+}
+
 .control-band {
   display: grid;
-  grid-template-columns: minmax(120px, 0.7fr) minmax(220px, 1.7fr) minmax(150px, 1fr) minmax(138px, 0.8fr) minmax(110px, auto) repeat(2, auto);
+  grid-template-columns: minmax(104px, 0.55fr) minmax(108px, 0.55fr) minmax(200px, 1.5fr) minmax(130px, 0.8fr) minmax(120px, 0.7fr) minmax(100px, auto) repeat(2, auto);
   align-items: end;
   gap: 9px;
   padding: 10px 24px;

@@ -1,0 +1,120 @@
+# Agent Handoff Notes
+
+This repo is a Vite React dashboard plus Vercel serverless APIs for wish-pool `wish-20`.
+
+## Required Local Command Prefix
+
+In this workspace, shell commands must be prefixed with `rtk`.
+
+Examples:
+
+```bash
+rtk npm run build
+rtk npm run lint
+rtk vercel dev --listen 127.0.0.1:3000 --yes
+```
+
+## Product Shape
+
+- The public demo URL is `https://tourist-origin-radar.vercel.app`.
+- The GitHub repo is `https://github.com/yazelin/tourist-origin-radar`.
+- The dashboard has three data modes:
+  - `自動`: prefer realtime, fallback to annual.
+  - `近即時`: show Immigration APIS near-realtime data when available.
+  - `年度`: show Tourism Administration annual CSV data.
+- Ranking bar chart, share pie chart, metrics, and table use the active data mode.
+- The long-term trend chart always uses annual data (`2002-2025`) and maps the active Top markets to annual history.
+- Desktop layout is intentionally one-screen; page-level vertical scrolling should stay disabled. Detail rows scroll inside the table panel.
+
+## Data Sources
+
+- Realtime-ish source: NIA Immigration OpenData APIS.
+  - Dataset page: `https://data.gov.tw/dataset/88851`
+  - API docs: `https://opendata.immigration.gov.tw/v2/api-docs`
+  - API base: `https://opendata.immigration.gov.tw/APIS`
+  - Inbound endpoints use `{IATA}1`, for example `TPE1`, `KHH1`.
+  - Dataset description says it provides recent 3-hour arrivals and updates hourly.
+- Annual source: Tourism Administration CSV.
+  - `https://stat.taiwan.net.tw/data/opendata/7`
+- Monthly reference page:
+  - `https://admin.taiwan.net.tw/businessinfo/IssuePage?a=12124`
+
+## Known Vercel Issue
+
+As of 2026-07-02:
+
+- Local handler execution succeeds for `api/arrivals/realtime.js`.
+- Local `vercel dev` succeeds for `/api/arrivals/realtime`.
+- Vercel production still returns 502 for `/api/arrivals/realtime`.
+- The Vercel error is upstream timeout, e.g. `curl: (28) Connection timed out after 12000 milliseconds`.
+- Setting Vercel function region to `hkg1` did not fix it.
+- `/api/residence/annual` works on Vercel production and returns annual data for `2002-2025`.
+
+Conclusion: realtime code works, but Vercel's cloud egress cannot reliably reach NIA APIS. Treat this as an infrastructure/source-network limitation. To make the public demo realtime, deploy a proxy or backend on a Taiwan host/network that can reach NIA APIS, then point the frontend/API adapter at that proxy.
+
+## Verification Commands
+
+Build and lint:
+
+```bash
+rtk npm run build
+rtk npm run lint
+```
+
+Direct local realtime handler check:
+
+```bash
+rtk node --input-type=module - <<'NODE'
+import handler from './api/arrivals/realtime.js'
+let body
+let statusCode = 200
+await handler({}, {
+  setHeader() {},
+  status(code) {
+    statusCode = code
+    return { json(payload) { body = payload } }
+  },
+})
+console.log(JSON.stringify({
+  statusCode,
+  totalAll: body?.source?.totalAll,
+  totalForeign: body?.source?.totalForeign,
+  markets: body?.rows?.length,
+  top: body?.rows?.slice?.(0, 5).map((row) => [row.nationality, row.marketZh, row.values['近3小時']]),
+}, null, 2))
+NODE
+```
+
+Full local Vercel check:
+
+```bash
+rtk vercel dev --listen 127.0.0.1:3000 --yes
+rtk curl -s -w '\nHTTP %{http_code}\n' 'http://127.0.0.1:3000/api/arrivals/realtime' | head -c 1200
+rtk curl -s -w '\nHTTP %{http_code}\n' 'http://127.0.0.1:3000/api/residence/annual' | head -c 700
+```
+
+Production checks:
+
+```bash
+rtk curl -s -w '\nHTTP %{http_code}\n' 'https://tourist-origin-radar.vercel.app/api/arrivals/realtime' | head -c 1200
+rtk curl -s -w '\nHTTP %{http_code}\n' 'https://tourist-origin-radar.vercel.app/api/residence/annual' | head -c 700
+```
+
+Expected current production result: realtime may be `502`; annual should be `200`.
+
+## Deployment
+
+Deploy with:
+
+```bash
+rtk vercel --prod --yes
+```
+
+`vercel.json` currently sets API functions to `hkg1` and `maxDuration: 30`. Keep this unless there is evidence another region can reach NIA APIS better.
+
+## Important Implementation Notes
+
+- `api/arrivals/realtime.js` intentionally uses `curl` through `execFile` because direct Node `fetch` was less reliable against NIA APIS.
+- Do not treat all endpoint failures as fatal. Some airport endpoints may return HTML or empty data. The API should return 200 if any endpoint provides useful inbound rows.
+- Keep TWN in the API payload. The UI defaults to external-origin marketing view by excluding TWN, but users can switch to all arrivals.
+- If changing layout, verify desktop still has no page-level vertical scroll and charts have non-zero container height.

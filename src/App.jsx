@@ -110,8 +110,12 @@ async function fetchJson(path) {
 function App() {
   const [dataset, setDataset] = useState(fallbackResidence)
   const [annualDataset, setAnnualDataset] = useState(fallbackResidence)
+  const [realtimeDataset, setRealtimeDataset] = useState(null)
+  const [realtimeError, setRealtimeError] = useState(null)
+  const [annualError, setAnnualError] = useState(null)
   const [status, setStatus] = useState('loading')
   const [statusText, setStatusText] = useState('正在讀取官方開放資料')
+  const [dataMode, setDataMode] = useState('auto')
   const [year, setYear] = useState(fallbackResidence.years.at(-1))
   const [query, setQuery] = useState('')
   const [topN, setTopN] = useState(10)
@@ -130,23 +134,19 @@ function App() {
       } catch (error) {
         annualError = error
       }
+      if (cancelled) return
+      setAnnualDataset(annualData)
+      setAnnualError(annualError)
 
       try {
         const payload = await fetchJson('/api/arrivals/realtime')
         if (cancelled) return
-        setAnnualDataset(annualData)
-        setDataset(payload)
-        setYear(payload.years.at(-1))
-        setSelectedAirports(Object.keys(payload.source?.airportTotals || {}))
-        setStatus('live')
-        setStatusText(`近即時 ${formatNumber(payload.source?.totalForeign)} 人次；多年趨勢 ${annualData.years.at(0)}-${annualData.years.at(-1)}`)
+        setRealtimeDataset(payload)
+        setRealtimeError(null)
       } catch (error) {
         if (cancelled) return
-        setAnnualDataset(annualData)
-        setDataset(annualData)
-        setYear(annualData.years.at(-1))
-        setStatus('fallback')
-        setStatusText(`近即時 API 未啟用: ${error.message}；年度趨勢${annualError ? '使用備援樣本' : `已載入 ${annualData.years.at(0)}-${annualData.years.at(-1)}`}`)
+        setRealtimeDataset(null)
+        setRealtimeError(error)
       }
     }
     load()
@@ -154,6 +154,31 @@ function App() {
       cancelled = true
     }
   }, [])
+
+  useEffect(() => {
+    const annualRange = `${annualDataset.years.at(0)}-${annualDataset.years.at(-1)}`
+    const shouldShowAnnual = dataMode === 'annual' || !realtimeDataset
+    const nextDataset = shouldShowAnnual ? annualDataset : realtimeDataset
+
+    setDataset(nextDataset)
+    setYear((current) => nextDataset.years.includes(current) ? current : nextDataset.years.at(-1))
+    setSelectedAirports(Object.keys(nextDataset.source?.airportTotals || {}))
+
+    if (dataMode === 'annual') {
+      setStatus(annualError ? 'fallback' : 'annual')
+      setStatusText(`手動顯示年度資料 ${annualRange}${realtimeDataset ? '；近即時可切換' : realtimeError ? `；近即時不可用: ${realtimeError.message}` : ''}`)
+      return
+    }
+
+    if (realtimeDataset) {
+      setStatus('live')
+      setStatusText(`近即時 ${formatNumber(realtimeDataset.source?.totalForeign)} 人次；多年趨勢 ${annualRange}`)
+      return
+    }
+
+    setStatus('fallback')
+    setStatusText(`近即時 API 未啟用: ${realtimeError?.message || '尚未回傳'}；年度趨勢${annualError ? '使用備援樣本' : `已載入 ${annualRange}`}`)
+  }, [annualDataset, annualError, dataMode, realtimeDataset, realtimeError])
 
   const selectedYear = dataset.years.includes(year) ? year : dataset.years.at(-1)
   const previousYear = String(Number(selectedYear) - 1)
@@ -247,13 +272,12 @@ function App() {
     const file = event.target.files?.[0]
     if (!file) return
     try {
-      const csv = await file.text()
-      const parsed = parseResidenceCsv(csv)
-      setAnnualDataset(parsed)
-      setDataset(parsed)
-      setYear(parsed.years.at(-1))
-      setStatus('imported')
-      setStatusText(`已匯入 ${file.name}`)
+        const csv = await file.text()
+        const parsed = parseResidenceCsv(csv)
+        setAnnualDataset(parsed)
+        setAnnualError(null)
+        setDataMode('annual')
+        setStatusText(`已匯入 ${file.name}`)
     } catch (error) {
       setStatus('fallback')
       setStatusText(`CSV 匯入失敗: ${error.message}`)
@@ -274,6 +298,14 @@ function App() {
       </header>
 
       <section className="control-band" aria-label="資料與篩選">
+        <label>
+          資料視角
+          <select value={dataMode} onChange={(event) => setDataMode(event.target.value)}>
+            <option value="auto">自動</option>
+            <option value="realtime">近即時</option>
+            <option value="annual">年度</option>
+          </select>
+        </label>
         <label>
           資料期間
           <select value={selectedYear} onChange={(event) => setYear(event.target.value)}>
@@ -363,7 +395,7 @@ function App() {
                 <YAxis type="category" width={92} dataKey="marketZh" />
                 <Tooltip formatter={(value) => formatNumber(value)} />
                 <Bar dataKey="arrivals" radius={[0, 4, 4, 0]} isAnimationActive={false}>
-                  {topRows.map((entry, index) => <Cell key={entry.marketEn} fill={palette[index % palette.length]} />)}
+                  {topRows.map((entry, index) => <Cell key={`${entry.nationality || entry.marketEn}-${index}`} fill={palette[index % palette.length]} />)}
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
@@ -381,7 +413,7 @@ function App() {
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie data={topRows} dataKey="arrivals" nameKey="marketZh" innerRadius={58} outerRadius={92} paddingAngle={2} isAnimationActive={false}>
-                  {topRows.map((entry, index) => <Cell key={entry.marketEn} fill={palette[index % palette.length]} />)}
+                  {topRows.map((entry, index) => <Cell key={`${entry.nationality || entry.marketEn}-${index}`} fill={palette[index % palette.length]} />)}
                 </Pie>
                 <Tooltip formatter={(value) => formatNumber(value)} />
               </PieChart>
@@ -446,7 +478,7 @@ function App() {
             </thead>
             <tbody>
               {marketRowsWithShare.map((row, index) => (
-                <tr key={`${row.region}-${row.marketEn}`}>
+                <tr key={`${row.nationality || row.marketEn}-${row.region}-${index}`}>
                   <td>{index + 1}</td>
                   <td><strong>{row.marketZh}</strong><span>{row.marketEn}</span></td>
                   <td>{row.region}</td>
