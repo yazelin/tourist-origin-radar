@@ -130,6 +130,22 @@ export default async function handler(_request, response) {
     error: result.error,
   }))
 
+  if (totalAll === 0) {
+    response.status(502).json({
+      error: 'IMMIGRATION_APIS_NO_DATA',
+      message: '移民署 APIS 未回傳可用入境資料；常見原因是部署所在雲端 IP 被上游封鎖或所有 endpoint 暫無資料。',
+      source: {
+        mode: 'realtime',
+        title: '移民署入境人次預報 OpenData',
+        url: 'https://data.gov.tw/dataset/88851',
+        apiBase: IMMIGRATION_API_BASE,
+        fetchedAt,
+        endpoints: endpointStatus,
+      },
+    })
+    return
+  }
+
   response.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600')
   response.status(200).json({
     years: [PERIOD],
