@@ -3,7 +3,7 @@ export const realtimeSnapshot = {
     "近3小時"
   ],
   "totals": {
-    "近3小時": 15934
+    "近3小時": 18473
   },
   "rows": [
     {
@@ -13,12 +13,12 @@ export const realtimeSnapshot = {
       "nationality": "TWN",
       "isDomestic": true,
       "airports": {
-        "TPE": 10188,
-        "TSA": 568,
-        "KHH": 679
+        "TPE": 10599,
+        "TSA": 451,
+        "KHH": 2538
       },
       "values": {
-        "近3小時": 11435
+        "近3小時": 13588
       }
     },
     {
@@ -28,42 +28,12 @@ export const realtimeSnapshot = {
       "nationality": "USA",
       "isDomestic": false,
       "airports": {
-        "TPE": 1409,
-        "TSA": 26,
-        "KHH": 21
+        "TPE": 1478,
+        "TSA": 25,
+        "KHH": 44
       },
       "values": {
-        "近3小時": 1456
-      }
-    },
-    {
-      "region": "近即時入境",
-      "marketZh": "印尼",
-      "marketEn": "Indonesia",
-      "nationality": "IDN",
-      "isDomestic": false,
-      "airports": {
-        "TPE": 489,
-        "TSA": 2,
-        "KHH": 2
-      },
-      "values": {
-        "近3小時": 493
-      }
-    },
-    {
-      "region": "近即時入境",
-      "marketZh": "中國大陸",
-      "marketEn": "China",
-      "nationality": "CHN",
-      "isDomestic": false,
-      "airports": {
-        "TPE": 383,
-        "TSA": 53,
-        "KHH": 27
-      },
-      "values": {
-        "近3小時": 463
+        "近3小時": 1547
       }
     },
     {
@@ -73,11 +43,40 @@ export const realtimeSnapshot = {
       "nationality": "VNM",
       "isDomestic": false,
       "airports": {
-        "TPE": 404,
-        "KHH": 46
+        "TPE": 518,
+        "KHH": 47
       },
       "values": {
-        "近3小時": 450
+        "近3小時": 565
+      }
+    },
+    {
+      "region": "近即時入境",
+      "marketZh": "中國大陸",
+      "marketEn": "China",
+      "nationality": "CHN",
+      "isDomestic": false,
+      "airports": {
+        "TPE": 428,
+        "TSA": 20,
+        "KHH": 92
+      },
+      "values": {
+        "近3小時": 540
+      }
+    },
+    {
+      "region": "近即時入境",
+      "marketZh": "印尼",
+      "marketEn": "Indonesia",
+      "nationality": "IDN",
+      "isDomestic": false,
+      "airports": {
+        "TPE": 490,
+        "KHH": 13
+      },
+      "values": {
+        "近3小時": 503
       }
     },
     {
@@ -87,10 +86,10 @@ export const realtimeSnapshot = {
       "nationality": "PHL",
       "isDomestic": false,
       "airports": {
-        "TPE": 347
+        "TPE": 363
       },
       "values": {
-        "近3小時": 347
+        "近3小時": 363
       }
     },
     {
@@ -100,41 +99,12 @@ export const realtimeSnapshot = {
       "nationality": "JPN",
       "isDomestic": false,
       "airports": {
-        "TPE": 252,
+        "TPE": 197,
         "TSA": 29,
-        "KHH": 13
+        "KHH": 28
       },
       "values": {
-        "近3小時": 294
-      }
-    },
-    {
-      "region": "近即時入境",
-      "marketZh": "馬來西亞",
-      "marketEn": "Malaysia",
-      "nationality": "MYS",
-      "isDomestic": false,
-      "airports": {
-        "TPE": 230,
-        "TSA": 1,
-        "KHH": 3
-      },
-      "values": {
-        "近3小時": 234
-      }
-    },
-    {
-      "region": "近即時入境",
-      "marketZh": "加拿大",
-      "marketEn": "Canada",
-      "nationality": "CAN",
-      "isDomestic": false,
-      "airports": {
-        "TPE": 114,
-        "TSA": 1
-      },
-      "values": {
-        "近3小時": 115
+        "近3小時": 254
       }
     },
     {
@@ -144,54 +114,40 @@ export const realtimeSnapshot = {
       "nationality": "THA",
       "isDomestic": false,
       "airports": {
-        "TPE": 111,
+        "TPE": 171,
+        "KHH": 5
+      },
+      "values": {
+        "近3小時": 176
+      }
+    },
+    {
+      "region": "近即時入境",
+      "marketZh": "馬來西亞",
+      "marketEn": "Malaysia",
+      "nationality": "MYS",
+      "isDomestic": false,
+      "airports": {
+        "TPE": 153,
+        "KHH": 7
+      },
+      "values": {
+        "近3小時": 160
+      }
+    },
+    {
+      "region": "近即時入境",
+      "marketZh": "加拿大",
+      "marketEn": "Canada",
+      "nationality": "CAN",
+      "isDomestic": false,
+      "airports": {
+        "TPE": 124,
+        "TSA": 1,
         "KHH": 2
       },
       "values": {
-        "近3小時": 113
-      }
-    },
-    {
-      "region": "近即時入境",
-      "marketZh": "澳洲",
-      "marketEn": "Australia",
-      "nationality": "AUS",
-      "isDomestic": false,
-      "airports": {
-        "TPE": 92,
-        "KHH": 1
-      },
-      "values": {
-        "近3小時": 93
-      }
-    },
-    {
-      "region": "近即時入境",
-      "marketZh": "法國",
-      "marketEn": "France",
-      "nationality": "FRA",
-      "isDomestic": false,
-      "airports": {
-        "TPE": 50,
-        "TSA": 2,
-        "KHH": 1
-      },
-      "values": {
-        "近3小時": 53
-      }
-    },
-    {
-      "region": "近即時入境",
-      "marketZh": "德國",
-      "marketEn": "Germany",
-      "nationality": "DEU",
-      "isDomestic": false,
-      "airports": {
-        "TPE": 41,
-        "TSA": 1
-      },
-      "values": {
-        "近3小時": 42
+        "近3小時": 127
       }
     },
     {
@@ -201,10 +157,11 @@ export const realtimeSnapshot = {
       "nationality": "KOR",
       "isDomestic": false,
       "airports": {
-        "TPE": 42
+        "TPE": 54,
+        "KHH": 29
       },
       "values": {
-        "近3小時": 42
+        "近3小時": 83
       }
     },
     {
@@ -214,25 +171,41 @@ export const realtimeSnapshot = {
       "nationality": "SGP",
       "isDomestic": false,
       "airports": {
-        "TPE": 32,
-        "TSA": 1
+        "TPE": 61,
+        "TSA": 1,
+        "KHH": 20
       },
       "values": {
-        "近3小時": 33
+        "近3小時": 82
       }
     },
     {
       "region": "近即時入境",
-      "marketZh": "英國",
-      "marketEn": "United Kingdom",
-      "nationality": "GBR",
+      "marketZh": "澳洲",
+      "marketEn": "Australia",
+      "nationality": "AUS",
       "isDomestic": false,
       "airports": {
-        "TPE": 31,
-        "KHH": 1
+        "TPE": 74,
+        "KHH": 2
       },
       "values": {
-        "近3小時": 32
+        "近3小時": 76
+      }
+    },
+    {
+      "region": "近即時入境",
+      "marketZh": "法國",
+      "marketEn": "France",
+      "nationality": "FRA",
+      "isDomestic": false,
+      "airports": {
+        "TPE": 49,
+        "TSA": 1,
+        "KHH": 2
+      },
+      "values": {
+        "近3小時": 52
       }
     },
     {
@@ -242,11 +215,38 @@ export const realtimeSnapshot = {
       "nationality": "NLD",
       "isDomestic": false,
       "airports": {
-        "TPE": 26,
-        "TSA": 3
+        "TPE": 49,
+        "KHH": 2
       },
       "values": {
-        "近3小時": 29
+        "近3小時": 51
+      }
+    },
+    {
+      "region": "近即時入境",
+      "marketZh": "英國",
+      "marketEn": "United Kingdom",
+      "nationality": "GBR",
+      "isDomestic": false,
+      "airports": {
+        "TPE": 39,
+        "KHH": 3
+      },
+      "values": {
+        "近3小時": 42
+      }
+    },
+    {
+      "region": "近即時入境",
+      "marketZh": "德國",
+      "marketEn": "Germany",
+      "nationality": "DEU",
+      "isDomestic": false,
+      "airports": {
+        "TPE": 37
+      },
+      "values": {
+        "近3小時": 37
       }
     },
     {
@@ -256,11 +256,11 @@ export const realtimeSnapshot = {
       "nationality": "IND",
       "isDomestic": false,
       "airports": {
-        "TPE": 23,
+        "TPE": 26,
         "KHH": 1
       },
       "values": {
-        "近3小時": 24
+        "近3小時": 27
       }
     },
     {
@@ -270,10 +270,10 @@ export const realtimeSnapshot = {
       "nationality": "HKG",
       "isDomestic": false,
       "airports": {
-        "TPE": 23
+        "TPE": 22
       },
       "values": {
-        "近3小時": 23
+        "近3小時": 22
       }
     },
     {
@@ -283,10 +283,10 @@ export const realtimeSnapshot = {
       "nationality": "NZL",
       "isDomestic": false,
       "airports": {
-        "TPE": 18
+        "TPE": 20
       },
       "values": {
-        "近3小時": 18
+        "近3小時": 20
       }
     },
     {
@@ -296,11 +296,24 @@ export const realtimeSnapshot = {
       "nationality": "ITA",
       "isDomestic": false,
       "airports": {
-        "TPE": 14,
+        "TPE": 15,
         "TSA": 1
       },
       "values": {
-        "近3小時": 15
+        "近3小時": 16
+      }
+    },
+    {
+      "region": "近即時入境",
+      "marketZh": "PRT",
+      "marketEn": "PRT",
+      "nationality": "PRT",
+      "isDomestic": false,
+      "airports": {
+        "TPE": 12
+      },
+      "values": {
+        "近3小時": 12
       }
     },
     {
@@ -310,10 +323,10 @@ export const realtimeSnapshot = {
       "nationality": "AUT",
       "isDomestic": false,
       "airports": {
-        "TPE": 14
+        "TPE": 11
       },
       "values": {
-        "近3小時": 14
+        "近3小時": 11
       }
     },
     {
@@ -331,22 +344,23 @@ export const realtimeSnapshot = {
     },
     {
       "region": "近即時入境",
-      "marketZh": "柬埔寨",
-      "marketEn": "Cambodia",
-      "nationality": "KHM",
+      "marketZh": "MMR",
+      "marketEn": "MMR",
+      "nationality": "MMR",
       "isDomestic": false,
       "airports": {
-        "TPE": 9
+        "TPE": 9,
+        "KHH": 1
       },
       "values": {
-        "近3小時": 9
+        "近3小時": 10
       }
     },
     {
       "region": "近即時入境",
-      "marketZh": "PRT",
-      "marketEn": "PRT",
-      "nationality": "PRT",
+      "marketZh": "柬埔寨",
+      "marketEn": "Cambodia",
+      "nationality": "KHM",
       "isDomestic": false,
       "airports": {
         "TPE": 8
@@ -357,41 +371,16 @@ export const realtimeSnapshot = {
     },
     {
       "region": "近即時入境",
-      "marketZh": "澳門",
-      "marketEn": "Macao",
-      "nationality": "MAC",
-      "isDomestic": false,
-      "airports": {
-        "TPE": 6
-      },
-      "values": {
-        "近3小時": 6
-      }
-    },
-    {
-      "region": "近即時入境",
-      "marketZh": "ESP",
-      "marketEn": "ESP",
-      "nationality": "ESP",
-      "isDomestic": false,
-      "airports": {
-        "TPE": 6
-      },
-      "values": {
-        "近3小時": 6
-      }
-    },
-    {
-      "region": "近即時入境",
       "marketZh": "RUS",
       "marketEn": "RUS",
       "nationality": "RUS",
       "isDomestic": false,
       "airports": {
-        "TPE": 6
+        "TPE": 6,
+        "KHH": 2
       },
       "values": {
-        "近3小時": 6
+        "近3小時": 8
       }
     },
     {
@@ -401,23 +390,23 @@ export const realtimeSnapshot = {
       "nationality": "MEX",
       "isDomestic": false,
       "airports": {
-        "TPE": 6
+        "TPE": 7
       },
       "values": {
-        "近3小時": 6
+        "近3小時": 7
       }
     },
     {
       "region": "近即時入境",
-      "marketZh": "POL",
-      "marketEn": "POL",
-      "nationality": "POL",
+      "marketZh": "ESP",
+      "marketEn": "ESP",
+      "nationality": "ESP",
       "isDomestic": false,
       "airports": {
-        "TPE": 5
+        "TPE": 7
       },
       "values": {
-        "近3小時": 5
+        "近3小時": 7
       }
     },
     {
@@ -435,15 +424,29 @@ export const realtimeSnapshot = {
     },
     {
       "region": "近即時入境",
-      "marketZh": "MMR",
-      "marketEn": "MMR",
-      "nationality": "MMR",
+      "marketZh": "澳門",
+      "marketEn": "Macao",
+      "nationality": "MAC",
       "isDomestic": false,
       "airports": {
-        "TPE": 4
+        "TPE": 3,
+        "KHH": 1
       },
       "values": {
         "近3小時": 4
+      }
+    },
+    {
+      "region": "近即時入境",
+      "marketZh": "KAZ",
+      "marketEn": "KAZ",
+      "nationality": "KAZ",
+      "isDomestic": false,
+      "airports": {
+        "TPE": 3
+      },
+      "values": {
+        "近3小時": 3
       }
     },
     {
@@ -461,49 +464,9 @@ export const realtimeSnapshot = {
     },
     {
       "region": "近即時入境",
-      "marketZh": "DNK",
-      "marketEn": "DNK",
-      "nationality": "DNK",
-      "isDomestic": false,
-      "airports": {
-        "TPE": 2,
-        "TSA": 1
-      },
-      "values": {
-        "近3小時": 3
-      }
-    },
-    {
-      "region": "近即時入境",
-      "marketZh": "BGR",
-      "marketEn": "BGR",
-      "nationality": "BGR",
-      "isDomestic": false,
-      "airports": {
-        "TPE": 3
-      },
-      "values": {
-        "近3小時": 3
-      }
-    },
-    {
-      "region": "近即時入境",
-      "marketZh": "BRA",
-      "marketEn": "BRA",
-      "nationality": "BRA",
-      "isDomestic": false,
-      "airports": {
-        "TPE": 3
-      },
-      "values": {
-        "近3小時": 3
-      }
-    },
-    {
-      "region": "近即時入境",
-      "marketZh": "SVK",
-      "marketEn": "SVK",
-      "nationality": "SVK",
+      "marketZh": "SWE",
+      "marketEn": "SWE",
+      "nationality": "SWE",
       "isDomestic": false,
       "airports": {
         "TPE": 3
@@ -527,9 +490,9 @@ export const realtimeSnapshot = {
     },
     {
       "region": "近即時入境",
-      "marketZh": "KAZ",
-      "marketEn": "KAZ",
-      "nationality": "KAZ",
+      "marketZh": "BGR",
+      "marketEn": "BGR",
+      "nationality": "BGR",
       "isDomestic": false,
       "airports": {
         "TPE": 3
@@ -540,12 +503,81 @@ export const realtimeSnapshot = {
     },
     {
       "region": "近即時入境",
-      "marketZh": "SWE",
-      "marketEn": "SWE",
-      "nationality": "SWE",
+      "marketZh": "GBN",
+      "marketEn": "GBN",
+      "nationality": "GBN",
+      "isDomestic": false,
+      "airports": {
+        "TPE": 2,
+        "KHH": 1
+      },
+      "values": {
+        "近3小時": 3
+      }
+    },
+    {
+      "region": "近即時入境",
+      "marketZh": "HND",
+      "marketEn": "HND",
+      "nationality": "HND",
+      "isDomestic": false,
+      "airports": {
+        "TPE": 2,
+        "TSA": 1
+      },
+      "values": {
+        "近3小時": 3
+      }
+    },
+    {
+      "region": "近即時入境",
+      "marketZh": "DNK",
+      "marketEn": "DNK",
+      "nationality": "DNK",
+      "isDomestic": false,
+      "airports": {
+        "TPE": 2,
+        "TSA": 1
+      },
+      "values": {
+        "近3小時": 3
+      }
+    },
+    {
+      "region": "近即時入境",
+      "marketZh": "FIN",
+      "marketEn": "FIN",
+      "nationality": "FIN",
       "isDomestic": false,
       "airports": {
         "TPE": 2
+      },
+      "values": {
+        "近3小時": 2
+      }
+    },
+    {
+      "region": "近即時入境",
+      "marketZh": "SOM",
+      "marketEn": "SOM",
+      "nationality": "SOM",
+      "isDomestic": false,
+      "airports": {
+        "TPE": 2
+      },
+      "values": {
+        "近3小時": 2
+      }
+    },
+    {
+      "region": "近即時入境",
+      "marketZh": "NOR",
+      "marketEn": "NOR",
+      "nationality": "NOR",
+      "isDomestic": false,
+      "airports": {
+        "TPE": 1,
+        "TSA": 1
       },
       "values": {
         "近3小時": 2
@@ -566,9 +598,9 @@ export const realtimeSnapshot = {
     },
     {
       "region": "近即時入境",
-      "marketZh": "SLV",
-      "marketEn": "SLV",
-      "nationality": "SLV",
+      "marketZh": "SVK",
+      "marketEn": "SVK",
+      "nationality": "SVK",
       "isDomestic": false,
       "airports": {
         "TPE": 2
@@ -593,40 +625,12 @@ export const realtimeSnapshot = {
     },
     {
       "region": "近即時入境",
-      "marketZh": "GBN",
-      "marketEn": "GBN",
-      "nationality": "GBN",
-      "isDomestic": false,
-      "airports": {
-        "TPE": 1,
-        "KHH": 1
-      },
-      "values": {
-        "近3小時": 2
-      }
-    },
-    {
-      "region": "近即時入境",
-      "marketZh": "HRV",
-      "marketEn": "HRV",
-      "nationality": "HRV",
+      "marketZh": "SLV",
+      "marketEn": "SLV",
+      "nationality": "SLV",
       "isDomestic": false,
       "airports": {
         "TPE": 2
-      },
-      "values": {
-        "近3小時": 2
-      }
-    },
-    {
-      "region": "近即時入境",
-      "marketZh": "HND",
-      "marketEn": "HND",
-      "nationality": "HND",
-      "isDomestic": false,
-      "airports": {
-        "TPE": 1,
-        "TSA": 1
       },
       "values": {
         "近3小時": 2
@@ -648,9 +652,48 @@ export const realtimeSnapshot = {
     },
     {
       "region": "近即時入境",
-      "marketZh": "FIN",
-      "marketEn": "FIN",
-      "nationality": "FIN",
+      "marketZh": "DZA",
+      "marketEn": "DZA",
+      "nationality": "DZA",
+      "isDomestic": false,
+      "airports": {
+        "TPE": 1
+      },
+      "values": {
+        "近3小時": 1
+      }
+    },
+    {
+      "region": "近即時入境",
+      "marketZh": "LBN",
+      "marketEn": "LBN",
+      "nationality": "LBN",
+      "isDomestic": false,
+      "airports": {
+        "TPE": 1
+      },
+      "values": {
+        "近3小時": 1
+      }
+    },
+    {
+      "region": "近即時入境",
+      "marketZh": "UKR",
+      "marketEn": "UKR",
+      "nationality": "UKR",
+      "isDomestic": false,
+      "airports": {
+        "TPE": 1
+      },
+      "values": {
+        "近3小時": 1
+      }
+    },
+    {
+      "region": "近即時入境",
+      "marketZh": "EGY",
+      "marketEn": "EGY",
+      "nationality": "EGY",
       "isDomestic": false,
       "airports": {
         "TPE": 1
@@ -674,9 +717,74 @@ export const realtimeSnapshot = {
     },
     {
       "region": "近即時入境",
-      "marketZh": "DZA",
-      "marketEn": "DZA",
-      "nationality": "DZA",
+      "marketZh": "ETH",
+      "marketEn": "ETH",
+      "nationality": "ETH",
+      "isDomestic": false,
+      "airports": {
+        "TPE": 1
+      },
+      "values": {
+        "近3小時": 1
+      }
+    },
+    {
+      "region": "近即時入境",
+      "marketZh": "BRA",
+      "marketEn": "BRA",
+      "nationality": "BRA",
+      "isDomestic": false,
+      "airports": {
+        "TPE": 1
+      },
+      "values": {
+        "近3小時": 1
+      }
+    },
+    {
+      "region": "近即時入境",
+      "marketZh": "NGA",
+      "marketEn": "NGA",
+      "nationality": "NGA",
+      "isDomestic": false,
+      "airports": {
+        "TPE": 1
+      },
+      "values": {
+        "近3小時": 1
+      }
+    },
+    {
+      "region": "近即時入境",
+      "marketZh": "CRI",
+      "marketEn": "CRI",
+      "nationality": "CRI",
+      "isDomestic": false,
+      "airports": {
+        "TPE": 1
+      },
+      "values": {
+        "近3小時": 1
+      }
+    },
+    {
+      "region": "近即時入境",
+      "marketZh": "TUN",
+      "marketEn": "TUN",
+      "nationality": "TUN",
+      "isDomestic": false,
+      "airports": {
+        "TPE": 1
+      },
+      "values": {
+        "近3小時": 1
+      }
+    },
+    {
+      "region": "近即時入境",
+      "marketZh": "POL",
+      "marketEn": "POL",
+      "nationality": "POL",
       "isDomestic": false,
       "airports": {
         "TPE": 1
@@ -700,6 +808,19 @@ export const realtimeSnapshot = {
     },
     {
       "region": "近即時入境",
+      "marketZh": "SRB",
+      "marketEn": "SRB",
+      "nationality": "SRB",
+      "isDomestic": false,
+      "airports": {
+        "TPE": 1
+      },
+      "values": {
+        "近3小時": 1
+      }
+    },
+    {
+      "region": "近即時入境",
       "marketZh": "MAR",
       "marketEn": "MAR",
       "nationality": "MAR",
@@ -713,9 +834,9 @@ export const realtimeSnapshot = {
     },
     {
       "region": "近即時入境",
-      "marketZh": "TUN",
-      "marketEn": "TUN",
-      "nationality": "TUN",
+      "marketZh": "BEL",
+      "marketEn": "BEL",
+      "nationality": "BEL",
       "isDomestic": false,
       "airports": {
         "TPE": 1
@@ -752,58 +873,6 @@ export const realtimeSnapshot = {
     },
     {
       "region": "近即時入境",
-      "marketZh": "LBN",
-      "marketEn": "LBN",
-      "nationality": "LBN",
-      "isDomestic": false,
-      "airports": {
-        "TPE": 1
-      },
-      "values": {
-        "近3小時": 1
-      }
-    },
-    {
-      "region": "近即時入境",
-      "marketZh": "EGY",
-      "marketEn": "EGY",
-      "nationality": "EGY",
-      "isDomestic": false,
-      "airports": {
-        "TPE": 1
-      },
-      "values": {
-        "近3小時": 1
-      }
-    },
-    {
-      "region": "近即時入境",
-      "marketZh": "CRI",
-      "marketEn": "CRI",
-      "nationality": "CRI",
-      "isDomestic": false,
-      "airports": {
-        "TPE": 1
-      },
-      "values": {
-        "近3小時": 1
-      }
-    },
-    {
-      "region": "近即時入境",
-      "marketZh": "NOR",
-      "marketEn": "NOR",
-      "nationality": "NOR",
-      "isDomestic": false,
-      "airports": {
-        "TSA": 1
-      },
-      "values": {
-        "近3小時": 1
-      }
-    },
-    {
-      "region": "近即時入境",
       "marketZh": "NIC",
       "marketEn": "NIC",
       "nationality": "NIC",
@@ -827,6 +896,19 @@ export const realtimeSnapshot = {
       "values": {
         "近3小時": 1
       }
+    },
+    {
+      "region": "近即時入境",
+      "marketZh": "CPV",
+      "marketEn": "CPV",
+      "nationality": "CPV",
+      "isDomestic": false,
+      "airports": {
+        "KHH": 1
+      },
+      "values": {
+        "近3小時": 1
+      }
     }
   ],
   "source": {
@@ -834,29 +916,29 @@ export const realtimeSnapshot = {
     "title": "快照備援: 移民署入境人次預報 OpenData",
     "url": "https://data.gov.tw/dataset/88851",
     "apiBase": "https://opendata.immigration.gov.tw/APIS",
-    "fetchedAt": "2026-07-02T11:38:20.608Z",
+    "fetchedAt": "2026-07-02T12:01:39.631Z",
     "cadence": "手動或自架 runner 更新；資料集說明為近3小時入境人次、每小時更新",
-    "totalAll": 15934,
-    "totalForeign": 4499,
+    "totalAll": 18473,
+    "totalForeign": 4885,
     "endpoints": [
       {
         "code": "TPE1",
         "label": "桃園機場",
-        "rows": 3247,
+        "rows": 3310,
         "ok": true,
         "error": null
       },
       {
         "code": "TSA1",
         "label": "松山機場",
-        "rows": 275,
+        "rows": 231,
         "ok": true,
         "error": null
       },
       {
         "code": "KHH1",
         "label": "高雄機場",
-        "rows": 275,
+        "rows": 471,
         "ok": true,
         "error": null
       },
@@ -877,23 +959,23 @@ export const realtimeSnapshot = {
       {
         "code": "CYI1",
         "label": "嘉義機場",
-        "rows": 1,
-        "ok": true,
-        "error": null
-      },
-      {
-        "code": "HUN1",
-        "label": "花蓮機場",
         "rows": 0,
         "ok": false,
         "error": "Unexpected token '<', \"<html><hea\"... is not valid JSON"
       },
       {
-        "code": "MZG1",
-        "label": "澎湖馬公機場",
+        "code": "HUN1",
+        "label": "花蓮機場",
         "rows": 1,
         "ok": true,
         "error": null
+      },
+      {
+        "code": "MZG1",
+        "label": "澎湖馬公機場",
+        "rows": 0,
+        "ok": false,
+        "error": "Unexpected token '<', \"<html><hea\"... is not valid JSON"
       },
       {
         "code": "PIF1",
@@ -905,9 +987,9 @@ export const realtimeSnapshot = {
       {
         "code": "TTT1",
         "label": "臺東機場",
-        "rows": 0,
-        "ok": false,
-        "error": "Unexpected token '<', \"<html><hea\"... is not valid JSON"
+        "rows": 1,
+        "ok": true,
+        "error": null
       },
       {
         "code": "KNH1",
@@ -967,9 +1049,9 @@ export const realtimeSnapshot = {
       }
     ],
     "airportTotals": {
-      "KHH": 801,
-      "TPE": 14441,
-      "TSA": 692
+      "KHH": 2844,
+      "TPE": 15096,
+      "TSA": 533
     },
     "note": "來源資料包含本國籍入境；dashboard 預設排除 TWN，以呈現行銷常用外籍來源市場，可在設定中切換。",
     "snapshot": true,
