@@ -49,11 +49,12 @@ As of 2026-07-02:
 - Local `vercel dev` succeeds for `/api/arrivals/realtime`.
 - The Vercel error is upstream timeout, e.g. `curl: (28) Connection timed out after 12000 milliseconds`.
 - Setting Vercel function region to `hkg1` did not fix it.
-- Current production behavior: if Vercel cannot reach NIA APIS, `/api/arrivals/realtime` returns the scheduled snapshot fallback from `api/arrivals/realtimeSnapshot.js` with `source.snapshot: true` and `X-Data-Fallback: snapshot`.
-- `.github/workflows/update-realtime-snapshot.yml` runs hourly and executes `scripts/update-realtime-snapshot.mjs`. If the GitHub Actions runner can reach NIA APIS, it updates `api/arrivals/realtimeSnapshot.js`, commits, pushes, and Vercel redeploys. If upstream is unreachable, it keeps the previous snapshot.
+- Current production behavior: if Vercel cannot reach NIA APIS, `/api/arrivals/realtime` returns the checked-in snapshot fallback from `api/arrivals/realtimeSnapshot.js` with `source.snapshot: true` and `X-Data-Fallback: snapshot`.
+- GitHub-hosted Actions was tested on 2026-07-02 and is not a viable hourly refresh path. Manual workflow run `28587249485` used an Azure `eastus` runner, and every configured APIS endpoint timed out after about 12 seconds (`curl: (28) Connection timed out after 12002 milliseconds`).
+- `.github/workflows/update-realtime-snapshot.yml` was removed because GitHub-hosted runners cannot reach the upstream APIS. Keep `scripts/update-realtime-snapshot.mjs` for manual refreshes or for a self-hosted runner on a network that can reach NIA APIS.
 - `/api/residence/annual` works on Vercel production and returns annual data for `2002-2025`.
 
-Conclusion: realtime code works, but Vercel's cloud egress cannot reliably reach NIA APIS. Treat this as an infrastructure/source-network limitation. The scheduled snapshot fallback is for demo continuity only. To make the public demo truly live, deploy a proxy or backend on a Taiwan host/network that can reach NIA APIS, then point the frontend/API adapter at that proxy.
+Conclusion: realtime code works, but Vercel's and GitHub-hosted Actions' cloud egress cannot reliably reach NIA APIS. Treat this as an infrastructure/source-network limitation. The snapshot fallback is for demo continuity only. To make the public demo truly live, deploy a proxy/backend or self-hosted refresh runner on a Taiwan host/network that can reach NIA APIS, then point the frontend/API adapter at that proxy or commit refreshed snapshots from that runner.
 
 ## Verification Commands
 
@@ -105,6 +106,14 @@ rtk curl -s -w '\nHTTP %{http_code}\n' 'https://tourist-origin-radar.vercel.app/
 
 Expected current production result: realtime should be `200` with live data or snapshot fallback; annual should be `200`.
 
+Manual snapshot refresh from a network that can reach NIA APIS:
+
+```bash
+rtk node scripts/update-realtime-snapshot.mjs
+```
+
+The script exits `2` and keeps the existing file if upstream returns no usable rows, or if the new snapshot is much smaller than an existing large snapshot. This prevents a partial endpoint outage from overwriting a better demo snapshot.
+
 ## Deployment
 
 Deploy with:
@@ -124,6 +133,13 @@ rtk vercel --prod --yes
 - If official annual CSV gains a new year, `/api/residence/annual` should include it automatically. Update `src/data/fallbackResidence.js` only when the offline fallback snapshot needs to include that new year.
 
 ## Wish-pool Reporting Token
+
+Other AI agents can collaborate in wish-pool, but only trusted writers can post updates.
+
+- Read access is public: agents can inspect wishes, needs, updates, and answers via the wish-pool API, `llms.txt`, `AGENTS.md`, or `skills/wish-pool/SKILL.md`.
+- Write access requires `WISHPOOL_AGENT_TOKEN`, which must match the wish-pool Worker `AGENT_TOKEN` secret.
+- `claim` is only a progress log, not an exclusive lock. Multiple people or agents can submit separate answers for the same wish.
+- `github_handle` is plain text and not verified; the site owner still chooses the accepted answer.
 
 To report progress back to wish-pool from a headless agent, set `WISHPOOL_AGENT_TOKEN` locally. It must match the wish-pool Cloudflare Worker `AGENT_TOKEN` secret.
 

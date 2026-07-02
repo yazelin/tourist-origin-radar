@@ -129,6 +129,31 @@ if (totalAll === 0) {
   process.exit(2)
 }
 
+const snapshotFile = new URL('../api/arrivals/realtimeSnapshot.js', import.meta.url)
+let existingTotalAll = 0
+
+try {
+  const existing = await import(`${snapshotFile.href}?t=${Date.now()}`)
+  existingTotalAll = Number(existing.realtimeSnapshot?.source?.totalAll ?? 0)
+} catch {
+  existingTotalAll = 0
+}
+
+if (existingTotalAll > 5000 && totalAll < existingTotalAll * 0.25) {
+  console.error(JSON.stringify({
+    error: 'New snapshot is much smaller than the existing snapshot; keeping existing snapshot.',
+    totalAll,
+    existingTotalAll,
+    endpoints: results.map((result) => ({
+      code: result.endpoint.code,
+      rows: result.rows.length,
+      ok: !result.error,
+      error: result.error,
+    })),
+  }, null, 2))
+  process.exit(2)
+}
+
 const rows = [...grouped.values()]
   .sort((a, b) => b.count - a.count)
   .map((item) => {
@@ -161,26 +186,23 @@ const snapshot = {
   rows,
   source: {
     mode: 'realtime',
-    title: '排程快照備援: 移民署入境人次預報 OpenData',
+    title: '快照備援: 移民署入境人次預報 OpenData',
     url: 'https://data.gov.tw/dataset/88851',
     apiBase: IMMIGRATION_API_BASE,
     fetchedAt,
-    cadence: 'GitHub Actions 每小時嘗試更新；資料集說明為近3小時入境人次、每小時更新',
+    cadence: '手動或自架 runner 更新；資料集說明為近3小時入境人次、每小時更新',
     totalAll,
     totalForeign,
     endpoints: endpointStatus,
     airportTotals: Object.fromEntries([...airportTotals.entries()].sort()),
     note: '來源資料包含本國籍入境；dashboard 預設排除 TWN，以呈現行銷常用外籍來源市場，可在設定中切換。',
     snapshot: true,
-    snapshotReason: 'Vercel production cannot reach NIA APIS directly; this snapshot is updated by GitHub Actions when the runner can access the upstream API.',
+    snapshotReason: 'Vercel production and GitHub-hosted Actions cannot reach NIA APIS directly; refresh this snapshot from a machine or self-hosted runner that can access the upstream API.',
     fallbackFor: 'IMMIGRATION_APIS_NO_DATA',
   },
 }
 
-fs.writeFileSync(
-  new URL('../api/arrivals/realtimeSnapshot.js', import.meta.url),
-  `export const realtimeSnapshot = ${JSON.stringify(snapshot, null, 2)}\n`,
-)
+fs.writeFileSync(snapshotFile, `export const realtimeSnapshot = ${JSON.stringify(snapshot, null, 2)}\n`)
 
 console.log(JSON.stringify({
   fetchedAt,
